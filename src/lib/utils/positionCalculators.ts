@@ -3,21 +3,56 @@ import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/types';
 /**
  * Calculates the total width of a subtree rooted at the given node.
  *
- * @param node - The root node of the subtree.
+ * @param node - The node of the subtree you want to start the search from.
  * @param nodeWidth - The width of a single node.
  * @returns The total width of the subtree.
  */
-const calculateSubtreeWidth = (node: OrgNodeItem, nodeWidth: number): number => {
+const calculateSubtreeWidth = (
+	node: OrgNodeItem,
+	nodeWidth: number,
+	parentX: number = 0
+): number => {
 	if (node.children.length === 0) {
 		return nodeWidth;
 	}
 
-	const totalWidth = node.children.reduce((sum, child) => {
-		return sum + calculateSubtreeWidth(child, nodeWidth);
+	const totalWidth = node.children.reduce((sum, child, id) => {
+		if (node.style === NodeStyles.List) {
+			let max = Math.max(
+				...node.children.map((child) => calculateSubtreeWidth(child, nodeWidth, parentX))
+			);
+
+			return max + sum;
+		}
+		return sum + calculateSubtreeWidth(child, nodeWidth, parentX);
 	}, 0);
 
-	const siblingPadding = (node.children.length - 1) * 20;
+	const siblingPadding = (node.children.length - 1) * 30;
 	return totalWidth + siblingPadding;
+};
+
+/**
+ * Calculates the total height of a subtree from the given node.
+ *
+ * @param node - The node of the subtree you want to start the search from.
+ * @param nodeHeight - The height of a single node.
+ * @param verticalSpacing - The vertical spacing setting
+ * @returns The total height of the subtree.
+ */
+const calculateSubtreeHeight = (
+	node: OrgNodeItem,
+	nodeHeight: number,
+	verticalSpacing: number
+): number => {
+	if (node.children.length === 0) {
+		return nodeHeight;
+	}
+
+	const maxChildHeight = Math.max(
+		...node.children.map((child) => calculateSubtreeHeight(child, nodeHeight, verticalSpacing))
+	);
+
+	return nodeHeight + verticalSpacing + maxChildHeight;
 };
 
 /**
@@ -39,8 +74,8 @@ const generatePositions = (
 	nodeWidth: number,
 	nodeHeight: number,
 	verticalSpacing: number,
-	layout: NodeLayout = []
-): NodeLayout => {
+	layout: NodeLayout[] = []
+): NodeLayout[] => {
 	layout.push({
 		node,
 		positionX: parentX,
@@ -49,15 +84,43 @@ const generatePositions = (
 		height: nodeHeight
 	});
 
+	if (node.style === NodeStyles.List && node.children.length > 0) {
+		const childY = parentY + verticalSpacing + nodeHeight;
+		const totalChildWidth = nodeWidth;
+
+		const firstChildX = parentX - totalChildWidth / 2;
+		let currentX = firstChildX;
+		let beforeChild: OrgNodeItem;
+		node.children.forEach((child, id) => {
+			const childWidth = calculateSubtreeWidth(child, nodeWidth);
+			generatePositions(
+				child,
+				currentX + childWidth / 2 + 20,
+				childY +
+					id * 3 +
+					(id !== 1
+						? 0
+						: calculateSubtreeHeight(beforeChild, nodeHeight, verticalSpacing) + verticalSpacing),
+				nodeWidth,
+				nodeHeight,
+				verticalSpacing,
+				layout
+			);
+
+			beforeChild = child;
+		});
+		return layout;
+	}
+
 	if (node.children.length > 0) {
 		const childY = parentY + verticalSpacing + nodeHeight;
-		const totalChildWidth = calculateSubtreeWidth(node, nodeWidth);
+		const totalChildWidth = calculateSubtreeWidth(node, nodeWidth, parentX);
 
 		const firstChildX = parentX - totalChildWidth / 2;
 
 		let currentX = firstChildX;
 		node.children.forEach((child) => {
-			const childWidth = calculateSubtreeWidth(child, nodeWidth);
+			const childWidth = calculateSubtreeWidth(child, nodeWidth, parentX);
 			generatePositions(
 				child,
 				currentX + childWidth / 2,
@@ -68,11 +131,11 @@ const generatePositions = (
 				layout
 			);
 
-			currentX += childWidth + 20;
+			currentX += childWidth + 30;
 		});
 	}
 
 	return layout;
 };
 
-export { generatePositions, calculateSubtreeWidth };
+export { generatePositions, calculateSubtreeWidth, calculateSubtreeHeight };

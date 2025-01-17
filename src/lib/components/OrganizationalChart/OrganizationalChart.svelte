@@ -7,7 +7,7 @@
 	let heightBetweenNodes = 30;
 
 	// svelte-ignore non_reactive_update
-	let layout: NodeLayout = [];
+	let layout: NodeLayout[] = [];
 	const nodeWidth = 100;
 	const nodeHeight = 60;
 
@@ -47,16 +47,36 @@
       L ${childX},${childY}
     `;
 	}
+
+	function drawListPath(parent: NodeLayout, childX: number, childY: number): string {
+		const sideX = parent.positionX - parent.width / 2 + 10;
+		const sideY = childY;
+
+		return `
+      M ${sideX},${parent.positionY}
+      L ${sideX},${sideY}
+      L ${childX},${sideY}
+      L ${childX},${childY}
+    `;
+	}
 </script>
 
-<svg width="1000" height="600">
+<svg width="1200" height="800">
+	<defs>
+		<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+			<circle cx="10" cy="10" r="1" fill="#ddd" />
+		</pattern>
+	</defs>
+
+	<rect width="100%" height="100%" fill="url(#dot-pattern)" />
+
 	{#each layout as parent}
 		{#if parent.node.children.length > 0}
 			{#each parent.node.children as child}
 				{#if layout.find((n: any) => n.node === child)}
 					<path
 						class="line"
-						d={parent.node.style == NodeStyles.Connected
+						d={parent.node.style === NodeStyles.Connected
 							? drawConnectedPath(
 									parent.positionX,
 									parent.positionY,
@@ -64,13 +84,19 @@
 									layout.find((n) => n.node === child)?.positionY ?? 0,
 									parent.height
 								)
-							: drawTreePath(
-									parent.positionX,
-									parent.positionY,
-									layout.find((n) => n.node === child)?.positionX ?? 0,
-									layout.find((n) => n.node === child)?.positionY ?? 0,
-									parent.height
-								)}
+							: parent.node.style === NodeStyles.Tree
+								? drawTreePath(
+										parent.positionX,
+										parent.positionY,
+										layout.find((n) => n.node === child)?.positionX ?? 0,
+										layout.find((n) => n.node === child)?.positionY ?? 0,
+										parent.height
+									)
+								: drawListPath(
+										parent,
+										layout.find((n) => n.node === child)?.positionX ?? 0,
+										layout.find((n) => n.node === child)?.positionY ?? 0
+									)}
 					/>
 				{/if}
 			{/each}

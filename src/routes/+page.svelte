@@ -8,9 +8,40 @@
 		children: [
 			{
 				name: 'Child 1',
-				style: NodeStyles.Connected,
+				style: NodeStyles.List,
 				children: [
-					{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] },
+					{
+						name: 'Child 1-1',
+						style: NodeStyles.Tree,
+						children: [
+							{
+								name: 'Child 1-1',
+								style: NodeStyles.Tree,
+								children: [
+									{
+										name: 'Child 1-1',
+										style: NodeStyles.Tree,
+										children: [{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }]
+									}
+								]
+							},
+							{
+								name: 'Child 1-1',
+								style: NodeStyles.List,
+								children: [
+									{
+										name: 'Child 1-1',
+										style: NodeStyles.Connected,
+										children: [
+											{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] },
+											{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }
+										]
+									},
+									{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }
+								]
+							}
+						]
+					},
 
 					{
 						name: 'Child 1-2',

@@ -10,7 +10,7 @@ export type NodeLayout = {
 	positionY: number;
 	width: number;
 	height: number;
-}[];
+};
 
 export enum NodeStyles {
 	Connected,
