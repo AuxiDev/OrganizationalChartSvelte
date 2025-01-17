@@ -1,44 +1,17 @@
 <script lang="ts">
 	import Card from '$lib/components/Card/Card.svelte';
+	import { generatePositions } from '$lib/utils/positionCalculators';
 	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/types';
 
 	let { data }: { data: OrgNodeItem } = $props();
 	let heightBetweenNodes = 30;
 
-	const layout: NodeLayout = [];
-	const nodeWidth = 60;
+	// svelte-ignore non_reactive_update
+	let layout: NodeLayout = [];
+	const nodeWidth = 100;
 	const nodeHeight = 60;
 
-	const generatePositions = (
-		node: OrgNodeItem,
-		parentX: number,
-		parentY: number,
-		childSpacing: number,
-		verticalSpacing: number
-	): void => {
-		layout.push({
-			node,
-			positionX: parentX,
-			positionY: parentY,
-			width: nodeWidth,
-			height: nodeHeight
-		});
-
-		if (node.children.length > 0) {
-			const childY = parentY + verticalSpacing + nodeHeight;
-			const totalChildWidth = childSpacing * (node.children.length - 1);
-
-			const firstChildX = parentX - totalChildWidth / 2;
-
-			node.children.forEach((child, index) => {
-				const childX = firstChildX + index * childSpacing;
-				generatePositions(child, childX, childY, childSpacing / 2, verticalSpacing);
-			});
-		}
-	};
-
-	generatePositions(data, 400, 50, 200, heightBetweenNodes);
-
+	layout = generatePositions(data, 500, 50, nodeWidth, nodeHeight, heightBetweenNodes);
 	function drawTreePath(
 		parentX: number,
 		parentY: number,
@@ -56,22 +29,48 @@
       L ${childX},${childY - parentHeight / 2}
     `;
 	}
+
+	function drawConnectedPath(
+		parentX: number,
+		parentY: number,
+		childX: number,
+		childY: number,
+		parentHeight: number
+	): string {
+		const midX = parentX;
+		const midY = childY;
+
+		return `
+      M ${parentX},${parentY}
+      L ${midX},${midY}
+      L ${childX},${midY}
+      L ${childX},${childY}
+    `;
+	}
 </script>
 
-<svg width="800" height="600">
+<svg width="1000" height="600">
 	{#each layout as parent}
 		{#if parent.node.children.length > 0}
 			{#each parent.node.children as child}
 				{#if layout.find((n: any) => n.node === child)}
 					<path
 						class="line"
-						d={drawTreePath(
-							parent.positionX,
-							parent.positionY,
-							layout.find((n) => n.node === child)?.positionX ?? 0,
-							layout.find((n) => n.node === child)?.positionY ?? 0,
-							parent.height
-						)}
+						d={parent.node.style == NodeStyles.Connected
+							? drawConnectedPath(
+									parent.positionX,
+									parent.positionY,
+									layout.find((n) => n.node === child)?.positionX ?? 0,
+									layout.find((n) => n.node === child)?.positionY ?? 0,
+									parent.height
+								)
+							: drawTreePath(
+									parent.positionX,
+									parent.positionY,
+									layout.find((n) => n.node === child)?.positionX ?? 0,
+									layout.find((n) => n.node === child)?.positionY ?? 0,
+									parent.height
+								)}
 					/>
 				{/if}
 			{/each}

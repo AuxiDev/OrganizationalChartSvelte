@@ -10,7 +10,6 @@
 
 <style>
 	.card {
-		width: 60px;
 		background-color: white;
 		border: 1px solid black;
 		text-align: center;
