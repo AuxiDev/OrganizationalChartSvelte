@@ -29,6 +29,7 @@ const calculateSubtreeWidth = (node: OrgNodeItem, nodeWidth: number): number => 
  * @param nodeWidth - The width of a single node. (-> Card Width)
  * @param nodeHeight - The height of a single node. (-> Card Heigth)
  * @param verticalSpacing - The vertical spacing between nodes. (-> Free to change, for appearance)
+ * @param layout - The array where the layout nodes will be stored in. Default value will be []. You can either get the result by providing your layout variable or by getting it from the return statement. (-> later returned to the top with all nodes because of recursion)
  * @returns An array of node layouts with their positions used to generate the SVG.
  */
 const generatePositions = (
