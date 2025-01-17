@@ -1,3 +1,32 @@
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+	import OrganizationalChart from '$lib/components/OrganizationalChart/OrganizationalChart.svelte';
+	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/types';
+
+	let orgChart: OrgNodeItem = {
+		name: 'Root',
+		style: NodeStyles.Tree,
+		children: [
+			{
+				name: 'Child 1',
+				style: NodeStyles.Tree,
+				children: [
+					{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] },
+
+					{ name: 'Child 1-2', style: NodeStyles.Tree, children: [] }
+				]
+			},
+			{
+				name: 'Child 2',
+				style: NodeStyles.Tree,
+				children: []
+			},
+			{
+				name: 'Child 2',
+				style: NodeStyles.Tree,
+				children: []
+			}
+		]
+	};
+</script>
+
+<OrganizationalChart data={orgChart} />
