@@ -6,6 +6,8 @@
 	let heightBetweenNodes = 30;
 
 	const layout: NodeLayout = [];
+	const nodeWidth = 60;
+	const nodeHeight = 60;
 
 	const generatePositions = (
 		node: OrgNodeItem,
@@ -14,9 +16,6 @@
 		childSpacing: number,
 		verticalSpacing: number
 	): void => {
-		const nodeWidth = 60;
-		const nodeHeight = 60;
-
 		layout.push({
 			node,
 			positionX: parentX,
@@ -80,8 +79,13 @@
 	{/each}
 
 	{#each layout as item}
-		<foreignObject x={item.positionX - 30} y={item.positionY - 30} width="65" height="120">
-			<Card data={item.node} />
+		<foreignObject
+			x={item.positionX - item.width / 2}
+			y={item.positionY - item.height / 2}
+			width={nodeWidth + 5}
+			height={nodeHeight + 5}
+		>
+			<Card data={item.node} height={item.height} width={item.width} />
 		</foreignObject>
 	{/each}
 </svg>
