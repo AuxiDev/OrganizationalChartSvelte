@@ -1,10 +1,19 @@
 <script lang="ts">
-	import type { OrgNodeItem } from '$types/types';
+	import type { NodeLayout, OrgNodeItem } from '$types/types';
 
-	let { data, height, width }: { data: OrgNodeItem; height: number; width: number } = $props();
+	let {
+		data,
+		height,
+		width,
+		layoutItem
+	}: { data: OrgNodeItem; height: number; width: number; layoutItem: NodeLayout } = $props();
 </script>
 
-<div class="card" style="height: {height}px; width: {width}px;">
+<div
+	class="card"
+	style="height: {height}px; width: {width}px;"
+	onclick={() => alert(`X: ${layoutItem.positionX} Y: ${layoutItem.positionY}`)}
+>
 	<p>{data.name}</p>
 </div>
 

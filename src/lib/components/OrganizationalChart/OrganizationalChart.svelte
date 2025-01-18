@@ -110,7 +110,7 @@
 			width={nodeWidth + 5}
 			height={nodeHeight + 5}
 		>
-			<Card data={item.node} height={item.height} width={item.width} />
+			<Card data={item.node} height={item.height} width={item.width} layoutItem={item} />
 		</foreignObject>
 	{/each}
 </svg>

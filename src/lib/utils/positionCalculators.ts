@@ -5,33 +5,31 @@ import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/types';
  *
  * @param node - The node of the subtree you want to start the search from.
  * @param nodeWidth - The width of a single node.
- * @param inList - If you are already in a list, calculation will adopt. (-> numbers are fun to play with)
  * @returns The total width of the subtree.
  */
-const calculateSubtreeWidth = (
-	node: OrgNodeItem,
-	nodeWidth: number,
-	inList: boolean = false
-): number => {
+const calculateSubtreeWidth = (node: OrgNodeItem, nodeWidth: number): number => {
 	if (node.children.length === 0) {
 		return nodeWidth;
 	}
+	const siblingPadding = (node.children.length - 1) * 30;
 
-	if (node.style === NodeStyles.List) {
-		if (!inList) {
-			inList = true;
-			return (
-				Math.max(...node.children.map((child) => calculateSubtreeWidth(child, nodeWidth, inList))) /
-				0.5
-			);
-		}
-	}
-
-	const totalWidth = node.children.reduce((sum, child) => {
-		return sum + calculateSubtreeWidth(child, nodeWidth, inList);
+	let totalWidth = node.children.reduce((sum, child) => {
+		return sum + calculateSubtreeWidth(child, nodeWidth);
 	}, 0);
 
-	const siblingPadding = (node.children.length - 1) * 30;
+	if (node.style == NodeStyles.List) {
+		let total: number = 0;
+		node.children.forEach((child, index) => {
+			let totalWidth = node.children.reduce((sum, child) => {
+				return sum + calculateSubtreeWidth(child, nodeWidth);
+			}, 0);
+
+			total = Math.max(total, totalWidth - 300);
+		});
+
+		return totalWidth + total + siblingPadding;
+	}
+
 	return totalWidth + siblingPadding;
 };
 
@@ -80,13 +78,14 @@ const generatePositions = (
 	verticalSpacing: number,
 	layout: NodeLayout[] = []
 ): NodeLayout[] => {
-	layout.push({
+	const newLayoutItem: NodeLayout = {
 		node,
 		positionX: parentX,
 		positionY: parentY,
 		width: nodeWidth,
 		height: nodeHeight
-	});
+	};
+	layout.push(newLayoutItem);
 
 	if (node.children.length > 0) {
 		const childY = parentY + verticalSpacing + nodeHeight;
@@ -101,7 +100,7 @@ const generatePositions = (
 				const childWidth = calculateSubtreeWidth(child, nodeWidth);
 				generatePositions(
 					child,
-					currentX + childWidth / 2 + 20,
+					currentX + childWidth / 2 + 30,
 					childY +
 						(id !== 1
 							? 0
@@ -115,7 +114,7 @@ const generatePositions = (
 			});
 		} else {
 			node.children.forEach((child, index) => {
-				const childWidth = calculateSubtreeWidth(child, nodeWidth);
+				let childWidth = calculateSubtreeWidth(child, nodeWidth);
 				generatePositions(
 					child,
 					currentX + childWidth / 2,
