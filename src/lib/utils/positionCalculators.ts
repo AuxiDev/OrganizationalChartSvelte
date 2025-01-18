@@ -1,4 +1,4 @@
-import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/types';
+import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 
 /**
  * Calculates the total width of a subtree rooted at the given node.

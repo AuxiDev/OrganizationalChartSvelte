@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { NodeLayout, OrgNodeItem } from '$types/types';
+	import type { NodeLayout, OrgNodeItem } from '$types/chart';
 
 	let {
 		data,
