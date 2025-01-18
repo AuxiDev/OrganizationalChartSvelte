@@ -77,6 +77,27 @@
 		return null;
 	};
 
+	const removeNode = (node: OrgNodeItem, id: string): boolean => {
+		const index = node.children.findIndex((child) => child.id === id);
+		if (index !== -1) {
+			node.children.splice(index, 1);
+			return true;
+		}
+		for (let child of node.children) {
+			if (removeNode(child, id)) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	const deletePerson = () => {
+		orgChartStore.update((data) => {
+			removeNode(data, selectedItem.node.id ?? '');
+			return data;
+		});
+	};
+
 	const handleDialogSubmit = () => {
 		orgChartStore.update((data) => {
 			const targetNode = findNode(data, selectedItem.node.id ?? '');
@@ -101,10 +122,6 @@
 
 			return data;
 		});
-
-		dialogNameInput = '';
-		dialogSelectInput = null;
-		dialogDescriptionInput = '';
 	};
 </script>
 
@@ -162,13 +179,23 @@
 				dialogNameInput = selectedItem.node.name;
 				dialogSelectInput = selectedItem.node.style;
 				dialogDescriptionInput = selectedItem.node.description ?? '';
+				dialogImageInput = selectedItem.node.image ?? '';
 			}}>Edit</ContextMenu.Item
 		>
 		<ContextMenu.Item
 			action={() => {
 				dialogMode = 'Add';
 				showDialog = true;
+				dialogNameInput = '';
+				dialogSelectInput = null;
+				dialogDescriptionInput = '';
+				dialogImageInput = '';
 			}}>Add Person</ContextMenu.Item
+		>
+		<ContextMenu.Item
+			action={() => {
+				deletePerson();
+			}}>Delete Person</ContextMenu.Item
 		>
 	</ContextMenu>
 {/if}
@@ -185,7 +212,7 @@
 	{#each $layout as parent}
 		{#if parent.node.children.length > 0}
 			{#each parent.node.children as child}
-				{#if get(layout).find((n: any) => n.node === child)}
+				{#if get(layout).find((n) => n.node === child)}
 					<path
 						class="line"
 						d={parent.node.style === NodeStyles.Connected

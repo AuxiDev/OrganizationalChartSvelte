@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <button type="submit" class="submit-button"> Submit </button>
 
 <style>
