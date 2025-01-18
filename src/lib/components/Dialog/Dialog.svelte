@@ -2,7 +2,11 @@
 	import { type DialogContext } from '$types/dialog';
 	import { onMount, setContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	let { visible = $bindable(false), children }: { visible: boolean; children: any } = $props();
+	let {
+		visible = $bindable(false),
+		onSubmit,
+		children
+	}: { visible: boolean; onSubmit: any; children: any } = $props();
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -16,20 +20,28 @@
 			document.removeEventListener('keydown', handleKeydown);
 		};
 	});
-	const contextValue: DialogContext = {
-		closeMenu: () => {
-			visible = false;
-		}
-	};
 
-	setContext<DialogContext>('contextDialog', contextValue);
+	const submitted = (event: SubmitEvent) => {
+		const form = event.target as HTMLFormElement;
+		if (form && !form.checkValidity()) {
+			event.preventDefault();
+		}
+
+		onSubmit();
+		visible = false;
+	};
 </script>
 
 {#if visible}
-	<div class="dialog-content" transition:fade={{ duration: 300 }}>
-		{@render children?.()}
-	</div>
+	<form onsubmit={submitted}>
+		<div class="dialog-content" transition:fade={{ duration: 300 }}>
+			{@render children?.()}
+		</div>
+	</form>
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
+		role="button"
+		tabindex="0"
 		transition:fade={{ duration: 100 }}
 		onclick={() => (visible = false)}
 		class="dialog-overlay"
@@ -45,10 +57,11 @@
 		bottom: 0;
 		display: flex;
 		justify-content: center;
-		align-items: flex-end;
+		align-items: center;
 		z-index: 1;
 		backdrop-filter: blur(2px);
 	}
+
 	.dialog-content {
 		z-index: 2;
 		position: absolute;
@@ -61,5 +74,8 @@
 		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 		background-color: white;
 		border-radius: 10px;
+		padding: 20px;
+		margin: 0;
+		align-items: flex-end;
 	}
 </style>

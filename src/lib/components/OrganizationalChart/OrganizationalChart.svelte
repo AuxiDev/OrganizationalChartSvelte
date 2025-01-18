@@ -1,6 +1,10 @@
 <script lang="ts">
 	import Card from '$lib/components/Card/Card.svelte';
-	import { generatePositions } from '$lib/utils/positionCalculators';
+	import {
+		calculateSubtreeHeight,
+		calculateSubtreeWidth,
+		generatePositions
+	} from '$lib/utils/positionCalculators';
 	import { drawConnectedPath, drawListPath, drawTreePath } from '$lib/utils/drawLinePaths';
 	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 	import ContextMenu from '$lib/components/ContextMenu/index';
@@ -21,9 +25,14 @@
 
 	let heightBetweenNodes = 30;
 
+	let svgHeight = $state(800);
+	let svgWidth = $state(800);
+
 	let showContextMenu = $state(false);
 	let showDialog = $state(false);
 	let dialogNameInput: string = $state('');
+	let dialogImageInput: string = $state('');
+	let dialogDescriptionInput: string = $state('');
 	let dialogSelectInput: NodeStyles | null = $state(null);
 	// svelte-ignore non_reactive_update
 	let dialogMode: 'Edit' | 'Add' = 'Add';
@@ -40,8 +49,8 @@
 
 	// svelte-ignore non_reactive_update
 	let layout = writable<NodeLayout[]>();
-	const nodeWidth = 100;
-	const nodeHeight = 60;
+	const nodeWidth = 200;
+	const nodeHeight = 80;
 
 	orgChartStore.subscribe((value) => {
 		let temp = generatePositions(
@@ -52,6 +61,9 @@
 			nodeHeight,
 			heightBetweenNodes
 		);
+
+		svgWidth = Math.max(...temp.map((node) => node.positionX)) + nodeWidth;
+		svgHeight = Math.max(...temp.map((node) => node.positionY)) + nodeHeight;
 
 		layout.set(temp);
 	});
@@ -74,12 +86,16 @@
 					targetNode.children.push({
 						name: dialogNameInput,
 						style: dialogSelectInput,
+						description: dialogDescriptionInput,
+						image: dialogImageInput,
 						children: [],
 						id: uuidv4()
 					});
 				} else {
 					targetNode.name = dialogNameInput;
 					targetNode.style = dialogSelectInput;
+					targetNode.description = dialogDescriptionInput;
+					targetNode.image = dialogImageInput;
 				}
 			}
 
@@ -88,28 +104,35 @@
 
 		dialogNameInput = '';
 		dialogSelectInput = null;
+		dialogDescriptionInput = '';
 	};
 </script>
 
-<Dialog bind:visible={showDialog}>
+<Dialog bind:visible={showDialog} onSubmit={() => handleDialogSubmit()}>
 	{#if dialogMode == 'Add'}
-		<h1 style="margin-left: 20px; margin-top: 20px; font-size: 20px; ">
-			Add Person below <span style="color: #666;">{selectedItem.node.name}</span>
+		<h1 class="dialog-title">
+			Add Person below <span class="dialog-subtitle">{selectedItem.node.name}</span>
 		</h1>
-		<p style="margin-left: 20px;">
+		<p class="dialog-description">
 			Here you can add a person. You can change the name and the style.
 		</p>
 	{:else if dialogMode == 'Edit'}
-		<h1 style="margin-left: 20px; margin-top: 20px; font-size: 20px; ">
-			Editing: <span style="color: #666;">{selectedItem.node.name}</span>
+		<h1 class="dialog-title">
+			Editing: <span class="dialog-subtitle">{selectedItem.node.name}</span>
 		</h1>
-		<p style="margin-left: 20px;">
+		<p class="dialog-description">
 			Here you can edit a person. You can change the name and the style.
 		</p>
 	{/if}
 
-	<Dialog.InputText placeholder={'EnterName...'} bind:inputValue={dialogNameInput} label="Rename" />
+	<Dialog.InputText
+		requiered={true}
+		placeholder={'Enter Name...'}
+		bind:inputValue={dialogNameInput}
+		label="Rename"
+	/>
 	<Dialog.InputSelect
+		requiered={true}
 		options={[
 			{ name: 'Tree', value: NodeStyles.Tree },
 			{ name: 'Connected', value: NodeStyles.Connected },
@@ -118,7 +141,16 @@
 		bind:inputValue={dialogSelectInput}
 		label="Select Style"
 	/>
-	<Dialog.SubmitButton onSubmit={() => handleDialogSubmit()}></Dialog.SubmitButton>
+	<Dialog.InputText
+		requiered={false}
+		placeholder={'Enter Description...'}
+		bind:inputValue={dialogDescriptionInput}
+		label="Description"
+	/>
+	<hr class="dialog-divider" />
+	<Dialog.InputFile requiered={false} bind:inputValue={dialogImageInput} label="Description" />
+
+	<Dialog.SubmitButton></Dialog.SubmitButton>
 </Dialog>
 
 {#if showContextMenu && isEditor}
@@ -129,6 +161,7 @@
 				showDialog = true;
 				dialogNameInput = selectedItem.node.name;
 				dialogSelectInput = selectedItem.node.style;
+				dialogDescriptionInput = selectedItem.node.description ?? '';
 			}}>Edit</ContextMenu.Item
 		>
 		<ContextMenu.Item
@@ -140,7 +173,7 @@
 	</ContextMenu>
 {/if}
 
-<svg width="1400" height="800">
+<svg width={svgWidth} height={svgHeight}>
 	<defs>
 		<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
 			<circle cx="10" cy="10" r="1" fill="#ddd" />
@@ -197,6 +230,38 @@
 </svg>
 
 <style>
+	svg {
+		background-color: #f9f9f9;
+		border: 1px solid #ddd;
+		border-radius: 10px;
+		margin: 20px 20px;
+		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.line {
+		stroke: #666;
+		stroke-width: 2;
+		fill: none;
+	}
+
+	.dialog-title {
+		margin-left: 20px;
+		margin-top: 20px;
+		font-size: 20px;
+		align-self: flex-start;
+	}
+
+	.dialog-subtitle {
+		color: #666;
+	}
+
+	.dialog-description {
+		margin-left: 20px;
+	}
+
+	.dialog-divider {
+		width: 100%;
+	}
 	svg {
 		background-color: #f9f9f9;
 		border: 1px solid #ddd;

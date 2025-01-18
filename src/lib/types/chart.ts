@@ -1,5 +1,7 @@
 export type OrgNodeItem = {
 	name: string;
+	description?: string;
+	image?: string;
 	style: NodeStyles;
 	children: OrgNodeItem[];
 	id?: string;

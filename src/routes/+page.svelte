@@ -3,120 +3,102 @@
 	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 
 	let orgChart: OrgNodeItem = {
-		name: 'Top',
+		name: 'Alice Johnson',
 		style: NodeStyles.Tree,
+		description: 'CEO / Manager',
+		image: 'https://placehold.co/50x50',
 		children: [
 			{
-				name: 'Child 1',
+				name: 'Bob Smith',
 				style: NodeStyles.List,
+				description: 'Head of Department 1',
+				image: 'https://placehold.co/50x50',
 				children: [
 					{
-						name: 'Child 1-1',
+						name: 'Charlie Brown',
 						style: NodeStyles.Tree,
+						description: 'Manager 1-1',
+						image: 'https://placehold.co/50x50',
 						children: [
 							{
-								name: 'Child 1-1',
+								name: 'David Wilson',
 								style: NodeStyles.Tree,
+								description: 'Team Lead 1-1-1',
+								image: 'https://placehold.co/50x50',
 								children: [
 									{
-										name: 'Child 1-1',
+										name: 'Eve Davis',
 										style: NodeStyles.Tree,
-										children: [{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }]
+										description: 'Developer 1-1-1-1',
+										image: 'https://placehold.co/50x50',
+										children: []
 									},
 									{
-										name: 'Child 1-1',
+										name: 'Frank Miller',
 										style: NodeStyles.Tree,
-										children: [{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }]
-									}
-								]
-							},
-							{
-								name: 'Child 1-2-List',
-								style: NodeStyles.Tree,
-								children: [
-									{
-										name: 'Child 1-2',
-										style: NodeStyles.Tree,
-										children: [
-											{
-												name: 'Child 1-2',
-												style: NodeStyles.Tree,
-												children: []
-											},
-											{
-												name: 'Child 1-2',
-												style: NodeStyles.Tree,
-												children: []
-											},
-											{
-												name: 'Child 1-2',
-												style: NodeStyles.Tree,
-												children: []
-											}
-										]
-									}
-								]
-							},
-							{
-								name: 'Child 1-2',
-								style: NodeStyles.Tree,
-								children: []
-							}
-						]
-					},
-
-					{
-						name: 'Child 1-2',
-						style: NodeStyles.Tree,
-						children: []
-					}
-				]
-			},
-			{
-				name: 'Child 2',
-				style: NodeStyles.Tree,
-				children: [
-					{
-						name: 'Child 1-2',
-						style: NodeStyles.List,
-						children: [
-							{
-								name: 'Child 1-2',
-								style: NodeStyles.Tree,
-								children: [
-									{
-										name: 'Child 1-2',
-										style: NodeStyles.Tree,
+										description: 'Developer 1-1-1-2',
+										image: 'https://placehold.co/50x50',
 										children: []
 									}
 								]
 							},
 							{
-								name: 'Child 1-2',
+								name: 'Grace Lee',
 								style: NodeStyles.Tree,
+								description: 'Team Lead 1-1-2',
+								image: 'https://placehold.co/50x50',
+								children: [
+									{
+										name: 'Hank Moore',
+										style: NodeStyles.Tree,
+										description: 'Developer 1-1-2-1',
+										image: 'https://placehold.co/50x50',
+										children: []
+									}
+								]
+							},
+							{
+								name: 'Ivy Taylor',
+								style: NodeStyles.Tree,
+								description: 'Manager 1-1-2',
+								image: 'https://placehold.co/50x50',
 								children: []
 							}
 						]
 					},
 					{
-						name: 'Child 1-2',
+						name: 'Jack Anderson',
 						style: NodeStyles.Tree,
-						children: []
-					},
-					{
-						name: 'Child 1-2',
-						style: NodeStyles.Tree,
+						description: 'Manager 1-2',
+						image: 'https://placehold.co/50x50',
 						children: []
 					}
 				]
 			},
 			{
-				name: 'Child 2',
+				name: 'Karen Thomas',
 				style: NodeStyles.Tree,
+				description: 'Head of Department 2',
+				image: 'https://placehold.co/50x50',
+				children: [
+					{
+						name: 'Larry White',
+						style: NodeStyles.Tree,
+						description: 'Manager 2-1',
+						image: 'https://placehold.co/50x50',
+						children: []
+					}
+				]
+			},
+			{
+				name: 'Megan Harris',
+				style: NodeStyles.Tree,
+				description: 'Head of Department 3',
+				image: 'https://placehold.co/50x50',
 				children: []
 			}
 		]
 	};
 </script>
 
-<OrganizationalChart isEditor={true} />
+<OrganizationalChart isEditor={true} data={orgChart} />

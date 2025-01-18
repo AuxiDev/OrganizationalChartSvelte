@@ -1,36 +1,37 @@
 <script lang="ts">
 	let {
+		requiered,
 		placeholder = 'Enter something...',
 		inputValue = $bindable(),
 		label = 'Your Input'
-	}: { placeholder: string; inputValue: any; label: string } = $props();
+	}: { requiered: boolean; placeholder: string; inputValue: any; label: string } = $props();
 </script>
 
 <div class="input-container">
 	<label for="modern-input">{label}</label>
-	<input id="modern-input" type="text" bind:value={inputValue} {placeholder} />
+	<input required={requiered} id="modern-input" type="text" bind:value={inputValue} {placeholder} />
 </div>
 
 <style>
 	.input-container {
 		display: flex;
 		flex-direction: row;
-		gap: 0.5rem;
+		gap: 8px;
 		max-width: 300px;
-		margin: 10px auto;
+		margin: 10px;
 		text-align: right;
 		align-items: center;
 	}
 
 	label {
-		font-size: 1rem;
+		font-size: 16px;
 		color: black;
 		width: 100px;
 	}
 
 	input {
-		padding: 0.75rem 1rem;
-		font-size: 1rem;
+		padding: 12px 16px;
+		font-size: 16px;
 		border-radius: 5px;
 		height: 20px;
 		border: 1px solid #ccc;
