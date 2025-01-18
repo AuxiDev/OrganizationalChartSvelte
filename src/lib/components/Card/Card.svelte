@@ -12,7 +12,7 @@
 <div
 	class="card"
 	style="height: {height}px; width: {width}px;"
-	onclick={() => alert(`X: ${layoutItem.positionX} Y: ${layoutItem.positionY}`)}
+	onclick={() => alert(`X: ${layoutItem.positionX} Y: ${layoutItem.positionY} ID: ${data.id}`)}
 >
 	<p>{data.name}</p>
 </div>

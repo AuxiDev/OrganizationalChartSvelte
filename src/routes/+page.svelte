@@ -1,10 +1,9 @@
 <script lang="ts">
-	import ChartEditor from '$lib/components/ChartEditor/ChartEditor.svelte';
 	import OrganizationalChart from '$lib/components/OrganizationalChart/OrganizationalChart.svelte';
 	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 
 	let orgChart: OrgNodeItem = {
-		name: 'Root',
+		name: 'Top',
 		style: NodeStyles.Tree,
 		children: [
 			{
@@ -120,6 +119,4 @@
 	};
 </script>
 
-<ChartEditor />
-
-<OrganizationalChart data={orgChart} />
+<OrganizationalChart isEditor={true} />

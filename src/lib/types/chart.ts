@@ -2,6 +2,7 @@ export type OrgNodeItem = {
 	name: string;
 	style: NodeStyles;
 	children: OrgNodeItem[];
+	id?: string;
 };
 
 export type NodeLayout = {
