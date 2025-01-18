@@ -26,8 +26,8 @@
 								]
 							},
 							{
-								name: 'Child 1-1',
-								style: NodeStyles.List,
+								name: 'Child 1-2-List',
+								style: NodeStyles.Tree,
 								children: [
 									{
 										name: 'Child 1-2',
@@ -39,9 +39,15 @@
 												children: []
 											},
 											{
-												name: 'Child 1-2',
+												name: 'Child 1-3-List',
 												style: NodeStyles.Tree,
-												children: []
+												children: [
+													{
+														name: 'Child 1-2',
+														style: NodeStyles.Tree,
+														children: []
+													}
+												]
 											}
 										]
 									},
@@ -66,6 +72,16 @@
 				name: 'Child 2',
 				style: NodeStyles.Tree,
 				children: [
+					{
+						name: 'Child 1-2',
+						style: NodeStyles.Tree,
+						children: []
+					},
+					{
+						name: 'Child 1-2',
+						style: NodeStyles.Tree,
+						children: []
+					},
 					{
 						name: 'Child 1-2',
 						style: NodeStyles.Tree,

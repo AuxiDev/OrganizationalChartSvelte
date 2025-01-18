@@ -61,7 +61,7 @@
 	}
 </script>
 
-<svg width="1200" height="800">
+<svg width="1400" height="800">
 	<defs>
 		<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
 			<circle cx="10" cy="10" r="1" fill="#ddd" />
