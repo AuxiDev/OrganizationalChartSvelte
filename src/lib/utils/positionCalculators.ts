@@ -84,55 +84,47 @@ const generatePositions = (
 		height: nodeHeight
 	});
 
-	if (node.style === NodeStyles.List && node.children.length > 0) {
-		const childY = parentY + verticalSpacing + nodeHeight;
-		const totalChildWidth = nodeWidth;
-
-		const firstChildX = parentX - totalChildWidth / 2;
-		let currentX = firstChildX;
-		let beforeChild: OrgNodeItem;
-		node.children.forEach((child, id) => {
-			const childWidth = calculateSubtreeWidth(child, nodeWidth);
-			generatePositions(
-				child,
-				currentX + childWidth / 2 + 20,
-				childY +
-					id * 3 +
-					(id !== 1
-						? 0
-						: calculateSubtreeHeight(beforeChild, nodeHeight, verticalSpacing) + verticalSpacing),
-				nodeWidth,
-				nodeHeight,
-				verticalSpacing,
-				layout
-			);
-
-			beforeChild = child;
-		});
-		return layout;
-	}
-
 	if (node.children.length > 0) {
 		const childY = parentY + verticalSpacing + nodeHeight;
-		const totalChildWidth = calculateSubtreeWidth(node, nodeWidth, parentX);
-
-		const firstChildX = parentX - totalChildWidth / 2;
-
+		let totalChildWidth = calculateSubtreeWidth(node, nodeWidth, parentX);
+		let firstChildX = parentX - totalChildWidth / 2;
 		let currentX = firstChildX;
-		node.children.forEach((child) => {
-			const childWidth = calculateSubtreeWidth(child, nodeWidth, parentX);
-			generatePositions(
-				child,
-				currentX + childWidth / 2,
-				childY,
-				nodeWidth,
-				nodeHeight,
-				verticalSpacing,
-				layout
-			);
 
-			currentX += childWidth + 30;
-		});
+		if (node.style === NodeStyles.List) {
+			currentX = parentX - nodeWidth / 2;
+			let beforeChild: OrgNodeItem;
+			node.children.forEach((child, id) => {
+				const childWidth = calculateSubtreeWidth(child, nodeWidth);
+				generatePositions(
+					child,
+					currentX + childWidth / 2 + 20,
+					childY +
+						id * 3 +
+						(id !== 1
+							? 0
+							: calculateSubtreeHeight(beforeChild, nodeHeight, verticalSpacing) + verticalSpacing),
+					nodeWidth,
+					nodeHeight,
+					verticalSpacing,
+					layout
+				);
+				beforeChild = child;
+			});
+		} else {
+			node.children.forEach((child) => {
+				const childWidth = calculateSubtreeWidth(child, nodeWidth, parentX);
+				generatePositions(
+					child,
+					currentX + childWidth / 2,
+					childY,
+					nodeWidth,
+					nodeHeight,
+					verticalSpacing,
+					layout
+				);
+				currentX += childWidth + 30;
+			});
+		}
 	}
 
 	return layout;

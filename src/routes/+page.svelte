@@ -30,14 +30,26 @@
 								style: NodeStyles.List,
 								children: [
 									{
-										name: 'Child 1-1',
-										style: NodeStyles.Connected,
+										name: 'Child 1-2',
+										style: NodeStyles.Tree,
 										children: [
-											{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] },
-											{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }
+											{
+												name: 'Child 1-2',
+												style: NodeStyles.Tree,
+												children: []
+											},
+											{
+												name: 'Child 1-2',
+												style: NodeStyles.Tree,
+												children: []
+											}
 										]
 									},
-									{ name: 'Child 1-1', style: NodeStyles.Tree, children: [] }
+									{
+										name: 'Child 1-2',
+										style: NodeStyles.Tree,
+										children: []
+									}
 								]
 							}
 						]
