@@ -22,8 +22,7 @@ function drawConnectedPath(
 	parentX: number,
 	parentY: number,
 	childX: number,
-	childY: number,
-	parentHeight: number
+	childY: number
 ): string {
 	const midX = parentX;
 	const midY = childY;

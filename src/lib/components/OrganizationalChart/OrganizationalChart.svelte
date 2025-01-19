@@ -3,6 +3,7 @@
 	import {
 		calculateSubtreeHeight,
 		calculateSubtreeWidth,
+		correctNegativePositioning,
 		generatePositions
 	} from '$lib/utils/positionCalculators';
 	import { drawConnectedPath, drawListPath, drawTreePath } from '$lib/utils/drawLinePaths';
@@ -13,14 +14,18 @@
 	import { assignIds } from '$lib/utils/helpers';
 	import { v4 as uuidv4 } from 'uuid';
 
-	let { isEditor = false, data = {} }: { isEditor: boolean; data?: any } = $props();
+	let {
+		isEditor = false,
+		data = {
+			name: 'Root',
+			style: NodeStyles.Tree,
+			description: 'CEO',
+			image: 'https://placehold.co/50x50',
+			children: []
+		}
+	}: { isEditor: boolean; data?: OrgNodeItem } = $props();
 
-	let orgChartStore = writable<OrgNodeItem>({
-		...data,
-		name: data.name || 'Root',
-		style: data.style || NodeStyles.Tree,
-		children: data.children || []
-	});
+	let orgChartStore = writable<OrgNodeItem>(data);
 	assignIds(get(orgChartStore));
 
 	let heightBetweenNodes = 30;
@@ -56,12 +61,14 @@
 	orgChartStore.subscribe((value) => {
 		let temp = generatePositions(
 			get(orgChartStore),
-			500,
+			900,
 			50,
 			nodeWidth,
 			nodeHeight,
 			heightBetweenNodes
 		);
+
+		correctNegativePositioning(temp, nodeWidth);
 
 		svgWidth = Math.max(...temp.map((node) => node.positionX)) + nodeWidth;
 		svgHeight = Math.max(...temp.map((node) => node.positionY)) + nodeHeight;
@@ -90,6 +97,18 @@
 			}
 		}
 		return false;
+	};
+
+	const clearPersons = () => {
+		orgChartStore.update(() => {
+			return {
+				name: 'Root',
+				style: NodeStyles.Tree,
+				description: 'CEO',
+				image: 'https://placehold.co/50x50',
+				children: []
+			};
+		});
 	};
 
 	const deletePerson = () => {
@@ -139,8 +158,6 @@
 	};
 </script>
 
-<button style="margin: 20px 0px 0px 20px;" class="button" onclick={downloadSVG}>Download SVG</button
->
 <Dialog bind:visible={showDialog} onSubmit={() => handleDialogSubmit()}>
 	{#if dialogMode == 'Add'}
 		<h1 class="dialog-title">
@@ -216,70 +233,86 @@
 	</ContextMenu>
 {/if}
 
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	bind:this={svg}
-	width={svgWidth}
-	height={svgHeight}
-	style="font-family: sans-serif;"
->
-	<defs>
-		<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
-			<circle cx="10" cy="10" r="1" fill="#ddd" />
-		</pattern>
-	</defs>
+<div class="editor-container">
+	<div class="tool-container">
+		<button style="margin: 20px 0px 0px 20px;" class="button" onclick={downloadSVG}
+			>Download SVG</button
+		>
+		<button style="margin: 20px 0px 0px 20px;" class="button" onclick={clearPersons}
+			>Clear SVG</button
+		>
+	</div>
 
-	<rect width="100%" height="100%" fill="url(#dot-pattern)" />
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		bind:this={svg}
+		width={svgWidth}
+		height={svgHeight}
+		style="font-family: sans-serif;"
+	>
+		<defs>
+			<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+				<circle cx="10" cy="10" r="1" fill="#ddd" />
+			</pattern>
+		</defs>
 
-	{#each $layout as parent}
-		{#if parent.node.children.length > 0}
-			{#each parent.node.children as child}
-				{#if get(layout).find((n) => n.node === child)}
-					<path
-						style="stroke: #666;stroke-width: 2;fill: none;"
-						d={parent.node.style === NodeStyles.Connected
-							? drawConnectedPath(
-									parent.positionX,
-									parent.positionY,
-									get(layout).find((n) => n.node === child)?.positionX ?? 0,
-									get(layout).find((n) => n.node === child)?.positionY ?? 0,
-									parent.height
-								)
-							: parent.node.style === NodeStyles.Tree
-								? drawTreePath(
+		<rect width="100%" height="100%" fill="url(#dot-pattern)" />
+
+		{#each $layout as parent}
+			{#if parent.node.children.length > 0}
+				{#each parent.node.children as child}
+					{#if get(layout).find((n) => n.node === child)}
+						<path
+							style="stroke: #666;stroke-width: 2;fill: none;"
+							d={parent.node.style === NodeStyles.Connected
+								? drawConnectedPath(
 										parent.positionX,
 										parent.positionY,
 										get(layout).find((n) => n.node === child)?.positionX ?? 0,
-										get(layout).find((n) => n.node === child)?.positionY ?? 0,
-										parent.height
-									)
-								: drawListPath(
-										parent,
-										get(layout).find((n) => n.node === child)?.positionX ?? 0,
 										get(layout).find((n) => n.node === child)?.positionY ?? 0
-									)}
-					/>
-				{/if}
-			{/each}
-		{/if}
-	{/each}
+									)
+								: parent.node.style === NodeStyles.Tree
+									? drawTreePath(
+											parent.positionX,
+											parent.positionY,
+											get(layout).find((n) => n.node === child)?.positionX ?? 0,
+											get(layout).find((n) => n.node === child)?.positionY ?? 0,
+											parent.height
+										)
+									: drawListPath(
+											parent,
+											get(layout).find((n) => n.node === child)?.positionX ?? 0,
+											get(layout).find((n) => n.node === child)?.positionY ?? 0
+										)}
+						/>
+					{/if}
+				{/each}
+			{/if}
+		{/each}
 
-	{#each $layout as item}
-		<foreignObject
-			x={item.positionX - item.width / 2}
-			y={item.positionY - item.height / 2}
-			width={nodeWidth + 5}
-			height={nodeHeight + 5}
-			oncontextmenu={(event) => openContextMenu(event, item)}
-			role="group"
-		>
-			<Card data={item.node} height={item.height} width={item.width} layoutItem={item} />
-		</foreignObject>
-	{/each}
-</svg>
+		{#each $layout as item}
+			<foreignObject
+				x={item.positionX - item.width / 2}
+				y={item.positionY - item.height / 2}
+				width={nodeWidth + 5}
+				height={nodeHeight + 5}
+				oncontextmenu={(event) => openContextMenu(event, item)}
+				role="group"
+			>
+				<Card data={item.node} height={item.height} width={item.width} layoutItem={item} />
+			</foreignObject>
+		{/each}
+	</svg>
+</div>
 
 <style>
+	.editor-container {
+		display: flex;
+		flex-direction: column;
+	}
+
 	.button {
+		max-width: 150px;
 		padding: 12px 16px;
 		font-size: 16px;
 		border-radius: 5px;

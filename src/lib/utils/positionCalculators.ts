@@ -1,6 +1,22 @@
 import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 
 /**
+ * Corrects the positioning of nodes if any node has a negative position. (-> moves it to above 0)
+ *
+ * @param layout - The array of node layouts to fix positioning for.
+ * @param nodeWidth - The width of a single node.
+ */
+const correctNegativePositioning = (layout: NodeLayout[], nodeWidth: number) => {
+	let farestLeftNodeX: number = Math.min(...layout.map((node) => node.positionX));
+	if (farestLeftNodeX <= nodeWidth) {
+		let absoluteDistance: number = Math.abs(farestLeftNodeX);
+		layout.forEach((node) => {
+			node.positionX += absoluteDistance + nodeWidth;
+		});
+	}
+};
+
+/**
  * Calculates the total width of a subtree rooted at the given node.
  *
  * @param node - The node of the subtree you want to start the search from.
@@ -132,4 +148,9 @@ const generatePositions = (
 	return layout;
 };
 
-export { generatePositions, calculateSubtreeWidth, calculateSubtreeHeight };
+export {
+	generatePositions,
+	calculateSubtreeWidth,
+	calculateSubtreeHeight,
+	correctNegativePositioning
+};

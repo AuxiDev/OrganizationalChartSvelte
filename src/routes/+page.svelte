@@ -4,72 +4,35 @@
 
 	let orgChart: OrgNodeItem = {
 		name: 'Alice Johnson',
-		style: NodeStyles.Tree,
-		description: 'CEO / Manager',
+		style: NodeStyles.Connected,
+		description: 'CEO',
 		image: 'https://placehold.co/50x50',
 		children: [
 			{
 				name: 'Bob Smith',
-				style: NodeStyles.List,
-				description: 'Head of Department 1',
+				style: NodeStyles.Tree,
+				description: 'CTO',
 				image: 'https://placehold.co/50x50',
 				children: [
 					{
 						name: 'Charlie Brown',
-						style: NodeStyles.Tree,
-						description: 'Manager 1-1',
+						style: NodeStyles.Connected,
+						description: 'Lead Developer',
 						image: 'https://placehold.co/50x50',
 						children: [
 							{
 								name: 'David Wilson',
-								style: NodeStyles.Tree,
-								description: 'Team Lead 1-1-1',
-								image: 'https://placehold.co/50x50',
-								children: [
-									{
-										name: 'Eve Davis',
-										style: NodeStyles.Tree,
-										description: 'Developer 1-1-1-1',
-										image: 'https://placehold.co/50x50',
-										children: []
-									},
-									{
-										name: 'Frank Miller',
-										style: NodeStyles.Tree,
-										description: 'Developer 1-1-1-2',
-										image: 'https://placehold.co/50x50',
-										children: []
-									}
-								]
-							},
-							{
-								name: 'Grace Lee',
-								style: NodeStyles.Tree,
-								description: 'Team Lead 1-1-2',
-								image: 'https://placehold.co/50x50',
-								children: [
-									{
-										name: 'Hank Moore',
-										style: NodeStyles.Tree,
-										description: 'Developer 1-1-2-1',
-										image: 'https://placehold.co/50x50',
-										children: []
-									}
-								]
-							},
-							{
-								name: 'Ivy Taylor',
-								style: NodeStyles.Tree,
-								description: 'Manager 1-1-2',
+								style: NodeStyles.List,
+								description: 'Senior Developer',
 								image: 'https://placehold.co/50x50',
 								children: []
 							}
 						]
 					},
 					{
-						name: 'Jack Anderson',
-						style: NodeStyles.Tree,
-						description: 'Manager 1-2',
+						name: 'Mia Harris',
+						style: NodeStyles.Connected,
+						description: 'Lead Developer',
 						image: 'https://placehold.co/50x50',
 						children: []
 					}
@@ -78,24 +41,31 @@
 			{
 				name: 'Karen Thomas',
 				style: NodeStyles.Tree,
-				description: 'Head of Department 2',
+				description: 'COO',
+				image: 'https://placehold.co/50x50',
+				children: []
+			},
+			{
+				name: 'Megan Harris',
+				style: NodeStyles.List,
+				description: 'CFO',
 				image: 'https://placehold.co/50x50',
 				children: [
 					{
 						name: 'Larry White',
+						style: NodeStyles.Connected,
+						description: 'Accountant',
+						image: 'https://placehold.co/50x50',
+						children: []
+					},
+					{
+						name: 'Frank Miller',
 						style: NodeStyles.Tree,
-						description: 'Manager 2-1',
+						description: 'Accountant',
 						image: 'https://placehold.co/50x50',
 						children: []
 					}
 				]
-			},
-			{
-				name: 'Megan Harris',
-				style: NodeStyles.Tree,
-				description: 'Head of Department 3',
-				image: 'https://placehold.co/50x50',
-				children: []
 			}
 		]
 	};

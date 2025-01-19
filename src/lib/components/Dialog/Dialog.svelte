@@ -64,7 +64,7 @@
 
 	.dialog-content {
 		z-index: 2;
-		position: absolute;
+		position: fixed;
 		display: flex;
 		flex-direction: column;
 		top: 50%;
