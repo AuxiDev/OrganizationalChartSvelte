@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { editPerson, personStore } from '$lib/stores/PersonStore';
+	import { createPerson, editPerson, personStore } from '$lib/stores/PersonStore';
 	import { setContext } from 'svelte';
 	import Dialog from '../Dialog/index';
 	import Input from '../UIElements/Input/Input.svelte';
@@ -11,19 +11,21 @@
 	import Button from '../UIElements/Button/Button.svelte';
 
 	let visible = $state(true);
-	let isEditing = $state(false);
+	let isChanging = $state(false);
+	let changingMode: 'ADD' | 'EDIT' = $state('ADD');
 	let nameValue = $state('');
 	let imageValue = $state('');
 	let descriptionValue = $state('');
 	let textSearch = $state('');
 	let filteredPersons = $state<ChartPerson[]>(get(personStore));
 	// svelte-ignore non_reactive_update
-	let personToEdit: ChartPerson | undefined;
+	let personToEdit: ChartPerson | undefined = $state();
 
 	const contextValue: PersonViewerContext = {
 		startEdit: (id: string) => {
-			isEditing = true;
-			personToEdit = get(personStore).find((person) => (person.id = id));
+			personToEdit = get(personStore).find((person) => person.id === id);
+			changingMode = 'EDIT';
+			isChanging = true;
 			nameValue = personToEdit?.name ?? '';
 			descriptionValue = personToEdit?.description ?? '';
 			imageValue = personToEdit?.image ?? '';
@@ -31,16 +33,18 @@
 	};
 
 	const saveChanges = () => {
-		console.log(descriptionValue);
-		editPerson(personToEdit?.id ?? '', {
-			id: '',
-			name: nameValue,
-			description: descriptionValue,
-			image: imageValue
-		});
+		if (changingMode === 'ADD') {
+			createPerson(nameValue, descriptionValue, imageValue);
+		} else {
+			editPerson(personToEdit?.id ?? '', {
+				id: '',
+				name: nameValue,
+				description: descriptionValue,
+				image: imageValue
+			});
+		}
 
-		isEditing = false;
-		console.log(get(personStore));
+		isChanging = false;
 	};
 
 	personStore.subscribe((state) => {
@@ -57,42 +61,59 @@
 	setContext('personViewerContext', contextValue);
 </script>
 
-<Dialog height={!isEditing ? 450 : 0} bind:visible>
-	{#if !isEditing}
+<Dialog height={!isChanging ? 450 : 0} width={!isChanging ? 500 : 400} bind:visible>
+	{#if !isChanging}
 		<div class="person-container">
 			{#each filteredPersons as person}
 				<PersonItem {person} />
 			{/each}
 			{#if $personStore.length == 0}
-				<h1>No persons found!</h1>
+				<h1 style="align-self: center;">No persons found!</h1>
 			{/if}
 		</div>
 		<div class="toolbar-container">
 			<div class="toolbar-input-container">
 				<Input
+					style="width: 100%;"
 					oninput={textSearchChanged}
 					bind:value={textSearch}
-					style="width: 100%"
 					placeholder="Search..."
 				/>
 				<div class="splitter"></div>
-				<Button style="height: 40px;" variant="primary">Add</Button>
+				<Button
+					onclick={() => {
+						changingMode = 'ADD';
+						isChanging = true;
+					}}
+					style="height: 40px;"
+					variant="primary">Add</Button
+				>
 			</div>
 		</div>
 	{:else}
-		<div class="edit-container">
-			<h1 class="edit-title">
-				Currently editing: <span class="edit-subtitle">&nbsp;{personToEdit?.name}</span>
-			</h1>
+		<form onsubmit={saveChanges} class="edit-container">
+			{#if changingMode === 'ADD'}
+				<p class="edit-title">Add a person!</p>
+			{:else}
+				<p class="edit-title">
+					Currently editing: <span class="edit-subtitle">&nbsp;{personToEdit?.name}</span>
+				</p>
+			{/if}
 			<div class="edit-inputs">
-				<Input style="width: 50%" label="Name" bind:value={nameValue} />
-				<Input style="width: 50%" label="Description" bind:value={descriptionValue} />
+				<Input requiered style="width: 50%" label="Name" bind:value={nameValue} />
+				<Input
+					style="width: 50%"
+					requiered={false}
+					label="Description"
+					bind:value={descriptionValue}
+				/>
 				<ImageInput requiered={false} bind:value={imageValue} />
 			</div>
 			<div class="footer-container">
-				<Button onclick={saveChanges} variant="primary">Save changes</Button>
+				<Button type="submit" variant="primary">Save changes</Button>
+				<Button onclick={() => (isChanging = false)} variant="secondary">Cancel</Button>
 			</div>
-		</div>
+		</form>
 	{/if}
 </Dialog>
 
@@ -108,10 +129,11 @@
 		gap: 20px;
 		background-color: #ffffff;
 		border-radius: 10px 10px 10px 10px;
-		padding: 15px 30px;
+		padding: 15px 20px;
 		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 	}
 	.toolbar-input-container {
+		width: 100%;
 		display: flex;
 		flex-direction: row;
 		gap: 8px;
@@ -131,6 +153,7 @@
 		align-self: flex-end;
 		margin: 20px;
 		height: 40px;
+		gap: 20px;
 	}
 	.edit-title {
 		display: flex;
@@ -159,7 +182,7 @@
 		flex-direction: column;
 	}
 	.person-container {
-		padding: 10px;
+		padding: 20px;
 		display: flex;
 		flex-direction: column;
 		width: 100%;

@@ -110,7 +110,6 @@
 		color: #fff;
 		font-size: 14px;
 		font-weight: bold;
-		width: 180px;
 		justify-content: center;
 		border-radius: 5px;
 		gap: 10px;

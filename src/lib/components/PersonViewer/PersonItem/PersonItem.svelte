@@ -17,7 +17,9 @@
 </script>
 
 <div class="item-container">
-	<img class="image" src={person.image ?? 'https://placehold.co/50x50'} alt={person.name} />
+	{#if person.image}
+		<img class="image" src={person.image ?? 'https://placehold.co/50x50'} alt={person.name} />
+	{/if}
 	<div class="text-container">
 		<p class="person-name">{person.name}</p>
 		<p class="person-description">{person.description}</p>
@@ -40,12 +42,12 @@
 		background-color: white;
 		min-height: 85px;
 		border-radius: 5px;
-		box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.1);
+		box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.2);
 		gap: 20px;
+		padding: 20px;
 	}
 
 	.image {
-		margin-left: 10px;
 		width: 50px;
 		height: 50px;
 		border-radius: 50%;
