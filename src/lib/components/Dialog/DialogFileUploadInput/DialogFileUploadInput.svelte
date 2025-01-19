@@ -70,7 +70,6 @@
 		align-items: center;
 		border-radius: 10px;
 		background-color: #f0f4f8;
-		margin: 0;
 	}
 
 	.input-file-container {
@@ -78,7 +77,7 @@
 		flex-direction: row;
 		gap: 8px;
 		max-width: 300px;
-		margin: 10px;
+
 		text-align: right;
 		align-items: center;
 	}
@@ -89,7 +88,7 @@
 	}
 
 	.input-file {
-		height: 25px;
+		height: 45px;
 		position: relative;
 		display: flex;
 		flex-direction: row;
@@ -99,16 +98,14 @@
 		color: #fff;
 		font-size: 14px;
 		font-weight: bold;
-		text-align: center;
-		width: 120px;
+		width: 180px;
+		justify-content: center;
 		border-radius: 5px;
-		user-select: none;
 		gap: 10px;
 		box-shadow:
 			0 4px 6px -1px #488aec31,
 			0 2px 4px -1px #488aec17;
 		transition: all 0.6s ease;
-		margin: 0;
 	}
 
 	.input-file:hover {
@@ -119,7 +116,7 @@
 
 	.input-file input {
 		position: absolute;
-		width: 160px;
+		width: 150px;
 		cursor: pointer;
 		left: 0;
 		height: 100%;

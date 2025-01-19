@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Card from '$lib/components/Card/Card.svelte';
+	import Card from '$lib/components/Card/SVGCard.svelte';
 	import {
 		calculateSubtreeHeight,
 		calculateSubtreeWidth,
@@ -28,6 +28,7 @@
 	let svgHeight = $state(800);
 	let svgWidth = $state(800);
 
+	let svg: SVGSVGElement | null = $state(null);
 	let showContextMenu = $state(false);
 	let showDialog = $state(false);
 	let dialogNameInput: string = $state('');
@@ -123,8 +124,23 @@
 			return data;
 		});
 	};
+
+	const downloadSVG = () => {
+		if (!svg) return;
+		const svgData = new XMLSerializer().serializeToString(svg);
+		const blob = new Blob([svgData], { type: 'image/svg+xml' });
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = 'organizationalChart.svg';
+		link.click();
+		URL.revokeObjectURL(url);
+	};
 </script>
 
+<button style="margin: 20px 0px 0px 20px;" class="button" onclick={downloadSVG}>Download SVG</button
+>
 <Dialog bind:visible={showDialog} onSubmit={() => handleDialogSubmit()}>
 	{#if dialogMode == 'Add'}
 		<h1 class="dialog-title">
@@ -164,7 +180,7 @@
 		bind:inputValue={dialogDescriptionInput}
 		label="Description"
 	/>
-	<hr class="dialog-divider" />
+	<hr class="dialog-divider" style="margin: 10px 0px;" />
 	<Dialog.InputFile requiered={false} bind:inputValue={dialogImageInput} label="Description" />
 
 	<Dialog.SubmitButton></Dialog.SubmitButton>
@@ -200,7 +216,13 @@
 	</ContextMenu>
 {/if}
 
-<svg width={svgWidth} height={svgHeight}>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	bind:this={svg}
+	width={svgWidth}
+	height={svgHeight}
+	style="font-family: sans-serif;"
+>
 	<defs>
 		<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
 			<circle cx="10" cy="10" r="1" fill="#ddd" />
@@ -214,7 +236,7 @@
 			{#each parent.node.children as child}
 				{#if get(layout).find((n) => n.node === child)}
 					<path
-						class="line"
+						style="stroke: #666;stroke-width: 2;fill: none;"
 						d={parent.node.style === NodeStyles.Connected
 							? drawConnectedPath(
 									parent.positionX,
@@ -257,6 +279,28 @@
 </svg>
 
 <style>
+	.button {
+		padding: 12px 16px;
+		font-size: 16px;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+		color: white;
+		background-color: #488aec;
+		box-shadow:
+			0 4px 6px -1px #488aec31,
+			0 2px 4px -1px #488aec17;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		margin: 0;
+		margin: 10px;
+	}
+
+	.button:hover {
+		border-color: #aaa;
+		background-color: #00affd;
+		color: #fff;
+	}
 	svg {
 		background-color: #f9f9f9;
 		border: 1px solid #ddd;
@@ -265,17 +309,10 @@
 		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 	}
 
-	.line {
-		stroke: #666;
-		stroke-width: 2;
-		fill: none;
-	}
-
 	.dialog-title {
-		margin-left: 20px;
-		margin-top: 20px;
 		font-size: 20px;
 		align-self: flex-start;
+		line-height: 30px;
 	}
 
 	.dialog-subtitle {
@@ -283,23 +320,10 @@
 	}
 
 	.dialog-description {
-		margin-left: 20px;
+		margin-bottom: 20px;
 	}
 
 	.dialog-divider {
 		width: 100%;
-	}
-	svg {
-		background-color: #f9f9f9;
-		border: 1px solid #ddd;
-		border-radius: 10px;
-		margin: 20px 20px;
-		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-	}
-
-	.line {
-		stroke: #666;
-		stroke-width: 2;
-		fill: none;
 	}
 </style>

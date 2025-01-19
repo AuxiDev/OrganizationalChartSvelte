@@ -45,7 +45,7 @@
 		font-size: 16px;
 		border-radius: 5px;
 		border: 1px solid #ccc;
-		width: 185px;
+		width: 180px;
 		transition: all 0.3s ease;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 		margin: 0;

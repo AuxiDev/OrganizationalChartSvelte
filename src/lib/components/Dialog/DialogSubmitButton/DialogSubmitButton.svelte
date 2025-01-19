@@ -13,9 +13,12 @@
 		transition: all 0.3s ease;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 		margin: 0;
+		margin: 10px;
 	}
 
 	.submit-button:hover {
 		border-color: #aaa;
+		background-color: #333;
+		color: #fff;
 	}
 </style>
