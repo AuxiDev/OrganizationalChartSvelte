@@ -1,15 +1,26 @@
 <script lang="ts">
+	import type { HTMLAttributes } from 'svelte/elements';
+
 	let {
-		requiered,
-		placeholder = 'Enter something...',
-		inputValue = $bindable(),
-		label = 'Your Input'
-	}: { requiered: boolean; placeholder: string; inputValue: any; label: string } = $props();
+		label,
+		value = $bindable(),
+		requiered = false,
+		...rest
+	} = $props<
+		{
+			label?: string;
+			style?: string;
+			requiered?: boolean;
+			value?: any;
+		} & Omit<HTMLAttributes<HTMLInputElement>, 'value' | 'requiered'>
+	>();
 </script>
 
 <div class="input-container">
-	<label for="modern-input">{label}</label>
-	<input required={requiered} id="modern-input" type="text" bind:value={inputValue} {placeholder} />
+	{#if label}
+		<label for="input">{label}</label>
+	{/if}
+	<input required={requiered} bind:value {...rest} />
 </div>
 
 <style>
@@ -17,10 +28,10 @@
 		display: flex;
 		flex-direction: row;
 		gap: 8px;
-		max-width: 300px;
-		margin: 10px;
+		width: 100%;
 		text-align: right;
 		align-items: center;
+		justify-content: end;
 	}
 
 	label {
@@ -34,8 +45,6 @@
 		font-size: 16px;
 		border-radius: 5px;
 		border: 1px solid #ccc;
-		width: 180px;
-
 		transition: all 0.3s ease;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	}

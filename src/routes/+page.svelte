@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ChartV2 from '$lib/components/ChartV2/ChartV2.svelte';
 	import OrganizationalChart from '$lib/components/OrganizationalChart/OrganizationalChart.svelte';
 	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 
@@ -74,4 +75,5 @@
 <p style="font-weight: bold; font-size: 20px; margin: 20px 20px 0px;">
 	Right click a node to view editing options!
 </p>
+<ChartV2 />
 <OrganizationalChart isEditor={true} data={orgChart} />

@@ -4,9 +4,11 @@
 	import { fade } from 'svelte/transition';
 	let {
 		visible = $bindable(false),
-		onSubmit,
-		children
-	}: { visible: boolean; onSubmit: any; children: any } = $props();
+		width = 400,
+		height = 300,
+		children,
+		...rest
+	}: { visible: boolean; width?: number; height?: number; children: any } = $props();
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -20,24 +22,17 @@
 			document.removeEventListener('keydown', handleKeydown);
 		};
 	});
-
-	const submitted = (event: SubmitEvent) => {
-		const form = event.target as HTMLFormElement;
-		if (form && !form.checkValidity()) {
-			event.preventDefault();
-		}
-
-		onSubmit();
-		visible = false;
-	};
 </script>
 
 {#if visible}
-	<form onsubmit={submitted}>
-		<div class="dialog-content" transition:fade={{ duration: 300 }}>
-			{@render children?.()}
-		</div>
-	</form>
+	<div
+		class="dialog-content"
+		style="width: {width}px; height: {height === 0 ? 'auto' : `${height}px`};"
+		transition:fade={{ duration: 300 }}
+		{...rest}
+	>
+		{@render children?.()}
+	</div>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		role="button"
@@ -74,7 +69,6 @@
 		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 		background-color: white;
 		border-radius: 10px;
-		padding: 20px;
 		margin: 0;
 		align-items: flex-end;
 	}

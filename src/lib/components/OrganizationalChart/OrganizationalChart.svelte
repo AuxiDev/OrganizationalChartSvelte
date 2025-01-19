@@ -13,6 +13,10 @@
 	import Dialog from '../Dialog/index';
 	import { assignIds } from '$lib/utils/helpers';
 	import { v4 as uuidv4 } from 'uuid';
+	import Input from '../UIElements/Input/Input.svelte';
+	import Button from '../UIElements/Button/Button.svelte';
+	import ImageInput from '../UIElements/ImageInput/ImageInput.svelte';
+	import SelectInput from '../UIElements/SelectInput/SelectInput.svelte';
 
 	let {
 		isEditor = false,
@@ -142,6 +146,8 @@
 
 			return data;
 		});
+
+		showDialog = false;
 	};
 
 	const downloadSVG = () => {
@@ -158,49 +164,47 @@
 	};
 </script>
 
-<Dialog bind:visible={showDialog} onSubmit={() => handleDialogSubmit()}>
-	{#if dialogMode == 'Add'}
-		<h1 class="dialog-title">
-			Add Person below <span class="dialog-subtitle">{selectedItem.node.name}</span>
-		</h1>
-		<p class="dialog-description">
-			Here you can add a person. You can change the name and the style.
-		</p>
-	{:else if dialogMode == 'Edit'}
-		<h1 class="dialog-title">
-			Editing: <span class="dialog-subtitle">{selectedItem.node.name}</span>
-		</h1>
-		<p class="dialog-description">
-			Here you can edit a person. You can change the name and the style.
-		</p>
-	{/if}
+<Dialog height={0} bind:visible={showDialog}>
+	<div class="dialog-container">
+		{#if dialogMode == 'Add'}
+			<h1 class="dialog-title">
+				Add Person below <span class="dialog-subtitle">{selectedItem.node.name}</span>
+			</h1>
+			<p class="dialog-description">
+				Here you can add a person. You can change the name and the style.
+			</p>
+		{:else if dialogMode == 'Edit'}
+			<h1 class="dialog-title">
+				Editing: <span class="dialog-subtitle">{selectedItem.node.name}</span>
+			</h1>
+			<p class="dialog-description">
+				Here you can edit a person. You can change the name and the style.
+			</p>
+		{/if}
 
-	<Dialog.InputText
-		requiered={true}
-		placeholder={'Enter Name...'}
-		bind:inputValue={dialogNameInput}
-		label="Rename"
-	/>
-	<Dialog.InputSelect
-		requiered={true}
-		options={[
-			{ name: 'Tree', value: NodeStyles.Tree },
-			{ name: 'Connected', value: NodeStyles.Connected },
-			{ name: 'List', value: NodeStyles.List }
-		]}
-		bind:inputValue={dialogSelectInput}
-		label="Select Style"
-	/>
-	<Dialog.InputText
-		requiered={false}
-		placeholder={'Enter Description...'}
-		bind:inputValue={dialogDescriptionInput}
-		label="Description"
-	/>
-	<hr class="dialog-divider" style="margin: 10px 0px;" />
-	<Dialog.InputFile requiered={false} bind:inputValue={dialogImageInput} label="Description" />
+		<form class="dialog-form" onsubmit={handleDialogSubmit}>
+			<Input requiered placeholder={'Enter Name...'} bind:value={dialogNameInput} label="Rename" />
+			<SelectInput
+				style="width: 100%;"
+				requiered
+				bind:value={dialogSelectInput}
+				label="Select Style"
+				><option value={NodeStyles.Tree}>Tree</option><option value={NodeStyles.Connected}
+					>Connected</option
+				><option value={NodeStyles.List}>List</option></SelectInput
+			>
+			<Input
+				requiered={false}
+				placeholder={'Enter Description...'}
+				bind:value={dialogDescriptionInput}
+				label="Description"
+			/>
+			<hr class="dialog-divider" style="margin: 10px 0px;" />
+			<ImageInput requiered={false} bind:value={dialogImageInput} />
 
-	<Dialog.SubmitButton></Dialog.SubmitButton>
+			<Button style="height: 40px;" variant="primary" type="submit">Submit</Button>
+		</form>
+	</div>
 </Dialog>
 
 {#if showContextMenu && isEditor}
@@ -358,5 +362,22 @@
 
 	.dialog-divider {
 		width: 100%;
+	}
+	.dialog-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		align-items: flex-end;
+		padding: 20px;
+	}
+
+	.dialog-form {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-self: flex-end;
+		align-items: flex-end;
+		margin-right: 20px;
+		gap: 20px;
 	}
 </style>

@@ -1,10 +1,18 @@
 <script lang="ts">
-	let {
-		requiered,
-		inputValue = $bindable()
-	}: { requiered: boolean; inputValue: any; label: string } = $props();
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	let imagePreview: string | undefined = $state('');
+	let {
+		value = $bindable(),
+		requiered = false,
+		...rest
+	} = $props<
+		{ value: string; requiered?: boolean } & Omit<
+			HTMLAttributes<HTMLInputElement>,
+			'value' | 'requiered'
+		>
+	>();
+
+	let imagePreview: string | undefined = $state(value);
 
 	const handleFileChange = (event: Event) => {
 		const fileInput = event.target as HTMLInputElement;
@@ -14,7 +22,7 @@
 			const reader = new FileReader();
 			reader.onload = () => {
 				imagePreview = reader.result as string;
-				inputValue = imagePreview;
+				value = imagePreview;
 			};
 			reader.readAsDataURL(file);
 		}
@@ -56,7 +64,13 @@
 				d="M17 15V18M17 21V18M17 18H14M17 18H20"
 			></path>
 		</svg>
-		<input required={requiered} type="file" accept="image/*" onchange={handleFileChange} />
+		<input
+			required={requiered}
+			{...rest}
+			type="file"
+			accept="image/*"
+			onchange={handleFileChange}
+		/>
 		ADD IMAGE
 	</div>
 </div>
@@ -76,8 +90,6 @@
 		display: flex;
 		flex-direction: row;
 		gap: 8px;
-		max-width: 300px;
-
 		text-align: right;
 		align-items: center;
 	}

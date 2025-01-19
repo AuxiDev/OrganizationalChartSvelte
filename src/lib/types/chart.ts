@@ -20,3 +20,17 @@ export enum NodeStyles {
 	List,
 	Tree
 }
+
+export type ChartNode = {
+	id: string;
+	person: ChartPerson;
+	style: NodeStyles;
+	children: ChartNode[];
+};
+
+export type ChartPerson = {
+	id: string;
+	name: string;
+	description?: string;
+	image?: string;
+};
