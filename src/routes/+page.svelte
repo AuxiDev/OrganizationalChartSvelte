@@ -71,4 +71,7 @@
 	};
 </script>
 
+<p style="font-weight: bold; font-size: 20px; margin: 20px 20px 0px;">
+	Right click a node to view editing options!
+</p>
 <OrganizationalChart isEditor={true} data={orgChart} />
