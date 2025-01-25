@@ -11,7 +11,7 @@
 	import Download from '../Icons/Download/Download.svelte';
 	import Dialog from '../UI/Dialog/Dialog.svelte';
 	import ImageInput from '../UI/ImageInput/ImageInput.svelte';
-	import ChartV2 from '../OrganizationalChart/OrganizationalChart.svelte';
+	import Chart from '../OrganizationalChart/OrganizationalChart.svelte';
 
 	createPerson('Mia', 'CEO', 'https://placehold.co/50x50');
 	createPerson('Lola', 'CFO', 'https://placehold.co/50x50');
@@ -21,6 +21,7 @@
 	let personName = $state('');
 	let personDescription = $state('');
 	let personImage = $state('');
+	let svg: SVGSVGElement | null = $state(null);
 
 	let dialogVisible = $state(false);
 
@@ -49,15 +50,31 @@
 		createPerson(personName, personDescription, personImage);
 		resetInputs();
 	};
+
+	const downloadSVG = () => {
+		console.log(svg);
+		if (!svg) return;
+		const svgData = new XMLSerializer().serializeToString(svg);
+		const blob = new Blob([svgData], { type: 'image/svg+xml' });
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = 'organizationalChart.svg';
+		link.click();
+		URL.revokeObjectURL(url);
+	};
 </script>
 
 <div class="editor-container">
 	<div class="toolbar-container">
 		<Button style="height: 30px; width: 30px; margin-top: 20px" variant="ghost"><Save /></Button>
-		<Button style="height: 30px; width: 30px" variant="ghost"><Download /></Button>
+		<Button style="height: 30px; width: 30px" variant="ghost" onclick={downloadSVG}
+			><Download /></Button
+		>
 	</div>
 	<div class="chart-container">
-		<ChartV2 isEditor={true} />
+		<Chart isEditor={true} bind:svgElement={svg} />
 	</div>
 	<div class="sidebar-container">
 		<SideBar style="width: 400px;" visible={true}>

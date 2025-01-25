@@ -29,6 +29,10 @@
 		resetInputs();
 	};
 
+	const handleDragStart = (event: DragEvent) => {
+		event.dataTransfer?.setData('personID', person.id);
+	};
+
 	const resetInputs = () => {
 		personName = person.name;
 		personDescription = person.description;
@@ -36,7 +40,7 @@
 	};
 </script>
 
-<div class="item-container">
+<div role="region" draggable={true} ondragstart={handleDragStart} class="item-container">
 	{#if person.image}
 		<img class="image" src={person.image ?? 'https://placehold.co/50x50'} alt={person.name} />
 	{/if}

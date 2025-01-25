@@ -29,7 +29,7 @@ const createPerson = (name: string, description?: string, image?: string) => {
 };
 
 const findPerson = (id: string) => {
-	return get(personStore).filter((person) => person.id !== id)[0];
+	return get(personStore).filter((person) => person.id === id)[0];
 };
 
 export { editPerson, deletePerson, createPerson, personStore, findPerson };

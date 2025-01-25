@@ -1,4 +1,4 @@
-import { NodeStyles, type ChartNode, type ChartPerson, type OrgNodeItem } from '$types/chart';
+import { NodeStyles, type ChartNode, type ChartPerson } from '$types/chart';
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';

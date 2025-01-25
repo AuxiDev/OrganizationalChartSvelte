@@ -6,21 +6,25 @@
 	import SvgCard from '../Card/SVGCard.svelte';
 	import { addNodeBelow, ChartStore, removeNode, updateNode } from '$lib/stores/ChartStore';
 	import { correctNegativePositioning, generatePositions } from '$lib/utils/positionCalculators';
-	import Input from '../UI/Input/Input.svelte';
 	import Button from '../UI/Button/Button.svelte';
 	import Dialog from '../UI/Dialog/Dialog.svelte';
 	import SelectInput from '../UI/SelectInput/SelectInput.svelte';
 	import { findPerson, personStore } from '$lib/stores/PersonStore';
+	import { onMount } from 'svelte';
 
-	let { isEditor = false }: { isEditor?: boolean } = $props();
+	let {
+		isEditor = false,
+		svgElement = $bindable()
+	}: { isEditor?: boolean; svgElement: SVGGElement | null } = $props();
 
 	let showContextMenu = $state(false);
 	let showDialog = $state(false);
+	// svelte-ignore non_reactive_update
 	let dialogMode: 'ADD' | 'EDIT' = 'ADD';
 	let contextMenuPosition = $state({ x: 0, y: 0 });
+	let svg: SVGGElement | null = $state(null);
 	let svgHeight = $state(800);
 	let svgWidth = $state(800);
-	let svg: SVGSVGElement | null = $state(null);
 	let layout = writable<NodeLayout[]>();
 
 	let dialogPerson = $state('');
@@ -31,6 +35,10 @@
 	const nodeWidth = 200;
 	const nodeHeight = 80;
 	const heightBetweenNodes = 30;
+
+	onMount(() => {
+		svgElement = svg;
+	});
 
 	ChartStore.subscribe(() => {
 		let temp = generatePositions(
