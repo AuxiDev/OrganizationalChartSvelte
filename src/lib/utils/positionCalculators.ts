@@ -1,4 +1,4 @@
-import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
+import { type ChartNode, type NodeLayout, NodeStyles } from '$types/chart';
 
 /**
  * Corrects the positioning of nodes if any node has a negative position. (-> moves it to above 0)
@@ -23,7 +23,7 @@ const correctNegativePositioning = (layout: NodeLayout[], nodeWidth: number) => 
  * @param nodeWidth - The width of a single node.
  * @returns The total width of the subtree.
  */
-const calculateSubtreeWidth = (node: OrgNodeItem, nodeWidth: number): number => {
+const calculateSubtreeWidth = (node: ChartNode, nodeWidth: number): number => {
 	if (node.children.length === 0) {
 		return nodeWidth;
 	}
@@ -58,7 +58,7 @@ const calculateSubtreeWidth = (node: OrgNodeItem, nodeWidth: number): number => 
  * @returns The total height of the subtree.
  */
 const calculateSubtreeHeight = (
-	node: OrgNodeItem,
+	node: ChartNode,
 	nodeHeight: number,
 	verticalSpacing: number
 ): number => {
@@ -86,7 +86,7 @@ const calculateSubtreeHeight = (
  * @returns An array of node layouts with their positions used to generate the SVG.
  */
 const generatePositions = (
-	node: OrgNodeItem,
+	node: ChartNode,
 	parentX: number,
 	parentY: number,
 	nodeWidth: number,
@@ -111,7 +111,7 @@ const generatePositions = (
 
 		if (node.style === NodeStyles.List) {
 			currentX = parentX - nodeWidth / 2;
-			let beforeChild: OrgNodeItem;
+			let beforeChild: ChartNode;
 			node.children.forEach((child, id) => {
 				const childWidth = calculateSubtreeWidth(child, nodeWidth);
 				generatePositions(

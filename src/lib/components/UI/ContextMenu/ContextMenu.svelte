@@ -24,13 +24,6 @@
 			visible = false;
 		}
 	};
-
-	const showMenu = (event: MouseEvent) => {
-		event.preventDefault();
-		visible = true;
-		menuPosition.x = event.clientX;
-		menuPosition.y = event.clientY;
-	};
 </script>
 
 {#if visible}

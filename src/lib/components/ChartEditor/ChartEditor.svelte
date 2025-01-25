@@ -9,11 +9,20 @@
 	import ArrowRight from '../Icons/ArrowRight/ArrowRight.svelte';
 	import Save from '../Icons/Save/Save.svelte';
 	import Download from '../Icons/Download/Download.svelte';
+	import Dialog from '../UI/Dialog/Dialog.svelte';
+	import ImageInput from '../UI/ImageInput/ImageInput.svelte';
+	import ChartV2 from '../OrganizationalChart/OrganizationalChart.svelte';
 
 	createPerson('Mia', 'CEO', 'https://placehold.co/50x50');
 	createPerson('Lola', 'CFO', 'https://placehold.co/50x50');
 	createPerson('Lucy', 'Developer', 'https://placehold.co/50x50');
 	createPerson('Noah', 'Jr. Developer', 'https://placehold.co/50x50');
+
+	let personName = $state('');
+	let personDescription = $state('');
+	let personImage = $state('');
+
+	let dialogVisible = $state(false);
 
 	let filteredPersons = $state<ChartPerson[]>(get(personStore));
 	let textSearch = $state('');
@@ -22,11 +31,23 @@
 		filteredPersons = state;
 	});
 
+	const resetInputs = () => {
+		personName = '';
+		personDescription = '';
+		personImage = '';
+	};
+
 	const textSearchChanged = () => {
 		const allPersons = get(personStore);
 		filteredPersons = allPersons.filter((person) =>
 			person.name.toLowerCase().includes(textSearch.toLowerCase())
 		);
+	};
+
+	const addPerson = () => {
+		dialogVisible = false;
+		createPerson(personName, personDescription, personImage);
+		resetInputs();
 	};
 </script>
 
@@ -36,10 +57,10 @@
 		<Button style="height: 30px; width: 30px" variant="ghost"><Download /></Button>
 	</div>
 	<div class="chart-container">
-		<h1>Edit Area</h1>
+		<ChartV2 isEditor={true} />
 	</div>
 	<div class="sidebar-container">
-		<SideBar style="width: 400px;" visible={false}>
+		<SideBar style="width: 400px;" visible={true}>
 			<div class="sidebar-content">
 				<div class="toolbar-input-container">
 					<Input
@@ -49,7 +70,9 @@
 						placeholder="Search..."
 					/>
 					<div class="splitter"></div>
-					<Button style="height: 40px;" variant="primary">Add</Button>
+					<Button style="height: 40px;" variant="primary" onclick={() => (dialogVisible = true)}
+						>Add</Button
+					>
 				</div>
 				<div class="person-container">
 					{#each filteredPersons as person}
@@ -61,7 +84,60 @@
 	</div>
 </div>
 
+<Dialog bind:visible={dialogVisible}>
+	<div class="dialog-content">
+		<h1 class="dialog-title">Add person</h1>
+		<form onsubmit={addPerson} class="input-container">
+			<Input bind:value={personName} placeholder="Name..." label="Name" requiered />
+			<Input
+				bind:value={personDescription}
+				placeholder="Description..."
+				label="Description"
+				requiered
+			/>
+			<ImageInput bind:value={personImage} />
+			<div class="button-container">
+				<Button variant="primary" type="submit">Save</Button>
+				<Button
+					onclick={() => {
+						dialogVisible = false;
+						resetInputs();
+					}}
+					variant="secondary"
+					type="submit">Cancel</Button
+				>
+			</div>
+		</form>
+	</div>
+</Dialog>
+
 <style>
+	.input-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-self: flex-end;
+		align-items: flex-end;
+		margin-right: 20px;
+		gap: 20px;
+		margin-top: 0px;
+	}
+	.dialog-title {
+		display: flex;
+		font-size: 20px;
+		line-height: 30px;
+	}
+
+	.dialog-content {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 100%;
+		padding: 20px;
+	}
+	.button-container {
+		margin-left: auto;
+	}
 	.sidebar-container {
 		display: flex;
 		flex-direction: column;

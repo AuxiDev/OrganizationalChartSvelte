@@ -2,11 +2,11 @@
 	import { getContext } from 'svelte';
 	import type { ContextMenuContext } from '$types/contextMenu';
 
-	let { action, children } = $props<{ action: () => void; children: any }>();
+	let { onaction, children } = $props<{ onaction?: () => void; children: any }>();
 	const { closeMenu } = getContext<ContextMenuContext>('contextMenu');
 
 	function handleClick() {
-		action();
+		onaction();
 		closeMenu();
 	}
 </script>
