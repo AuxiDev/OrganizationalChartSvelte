@@ -41,7 +41,7 @@
 	});
 
 	ChartStore.subscribe(() => {
-		let temp = generatePositions(
+		let generatedNodeLayout = generatePositions(
 			get(ChartStore),
 			900,
 			50,
@@ -50,12 +50,12 @@
 			heightBetweenNodes
 		);
 
-		correctNegativePositioning(temp, nodeWidth);
+		correctNegativePositioning(generatedNodeLayout, nodeWidth);
 
-		svgWidth = Math.max(...temp.map((node) => node.positionX)) + nodeWidth;
-		svgHeight = Math.max(...temp.map((node) => node.positionY)) + nodeHeight;
+		svgWidth = Math.max(...generatedNodeLayout.map((node) => node.positionX)) + nodeWidth;
+		svgHeight = Math.max(...generatedNodeLayout.map((node) => node.positionY)) + nodeHeight;
 
-		layout.set(temp);
+		layout.set(generatedNodeLayout);
 	});
 
 	const openContextMenu = (event: MouseEvent, item: NodeLayout) => {
@@ -76,66 +76,68 @@
 	};
 </script>
 
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	bind:this={svg}
-	width={svgWidth}
-	height={svgHeight}
-	style="font-family: sans-serif;"
->
-	<defs>
-		<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
-			<circle cx="10" cy="10" r="1" fill="#ddd" />
-		</pattern>
-	</defs>
+<div>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		bind:this={svg}
+		width={svgWidth}
+		height={svgHeight}
+		style="font-family: sans-serif;"
+	>
+		<defs>
+			<pattern id="dot-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+				<circle cx="10" cy="10" r="1" fill="#ddd" />
+			</pattern>
+		</defs>
 
-	<rect width="100%" height="100%" fill="url(#dot-pattern)" />
+		<rect width="100%" height="100%" fill="url(#dot-pattern)" />
 
-	{#each $layout as parent}
-		{#if parent.node.children.length > 0}
-			{#each parent.node.children as child}
-				{#if get(layout).find((n) => n.node === child)}
-					<path
-						style="stroke: #666;stroke-width: 2;fill: none;"
-						d={parent.node.style === NodeStyles.Connected
-							? drawConnectedPath(
-									parent.positionX,
-									parent.positionY,
-									get(layout).find((n) => n.node === child)?.positionX ?? 0,
-									get(layout).find((n) => n.node === child)?.positionY ?? 0
-								)
-							: parent.node.style === NodeStyles.Tree
-								? drawTreePath(
+		{#each $layout as parent}
+			{#if parent.node.children.length > 0}
+				{#each parent.node.children as child}
+					{#if get(layout).find((n) => n.node === child)}
+						<path
+							style="stroke: #666;stroke-width: 2;fill: none;"
+							d={parent.node.style === NodeStyles.Connected
+								? drawConnectedPath(
 										parent.positionX,
 										parent.positionY,
 										get(layout).find((n) => n.node === child)?.positionX ?? 0,
-										get(layout).find((n) => n.node === child)?.positionY ?? 0,
-										parent.height
-									)
-								: drawListPath(
-										parent,
-										get(layout).find((n) => n.node === child)?.positionX ?? 0,
 										get(layout).find((n) => n.node === child)?.positionY ?? 0
-									)}
-					/>
-				{/if}
-			{/each}
-		{/if}
-	{/each}
+									)
+								: parent.node.style === NodeStyles.Tree
+									? drawTreePath(
+											parent.positionX,
+											parent.positionY,
+											get(layout).find((n) => n.node === child)?.positionX ?? 0,
+											get(layout).find((n) => n.node === child)?.positionY ?? 0,
+											parent.height
+										)
+									: drawListPath(
+											parent,
+											get(layout).find((n) => n.node === child)?.positionX ?? 0,
+											get(layout).find((n) => n.node === child)?.positionY ?? 0
+										)}
+						/>
+					{/if}
+				{/each}
+			{/if}
+		{/each}
 
-	{#each $layout as item}
-		<foreignObject
-			x={item.positionX - item.width / 2}
-			y={item.positionY - item.height / 2}
-			width={nodeWidth + 5}
-			height={nodeHeight + 5}
-			oncontextmenu={(event) => openContextMenu(event, item)}
-			role="group"
-		>
-			<SvgCard data={item.node} height={item.height} width={item.width} layoutItem={item} />
-		</foreignObject>
-	{/each}
-</svg>
+		{#each $layout as item}
+			<foreignObject
+				x={item.positionX - item.width / 2}
+				y={item.positionY - item.height / 2}
+				width={nodeWidth + 5}
+				height={nodeHeight + 5}
+				oncontextmenu={(event) => openContextMenu(event, item)}
+				role="group"
+			>
+				<SvgCard data={item.node} height={item.height} width={item.width} layoutItem={item} />
+			</foreignObject>
+		{/each}
+	</svg>
+</div>
 
 {#if showContextMenu && isEditor}
 	<ContextMenu menuPosition={contextMenuPosition} bind:visible={showContextMenu}>

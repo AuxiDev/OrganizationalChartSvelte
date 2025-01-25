@@ -28,6 +28,14 @@
 	let filteredPersons = $state<ChartPerson[]>(get(personStore));
 	let textSearch = $state('');
 
+	let isMouseDown = $state(false);
+	let startX = 0;
+	let startY = 0;
+	let scrollLeft = 0;
+	let scrollTop = 0;
+
+	let chartContainer: HTMLDivElement | null = $state(null);
+
 	personStore.subscribe((state) => {
 		filteredPersons = state;
 	});
@@ -64,6 +72,40 @@
 		link.click();
 		URL.revokeObjectURL(url);
 	};
+
+	const onMouseDown = (event: MouseEvent) => {
+		isMouseDown = true;
+		startX = event.pageX - (chartContainer?.offsetLeft ?? 0);
+		startY = event.pageY - (chartContainer?.offsetTop ?? 0);
+		scrollLeft = chartContainer?.scrollLeft ?? 0;
+		scrollTop = chartContainer?.scrollTop ?? 0;
+	};
+
+	const onMouseLeave = () => {
+		isMouseDown = false;
+	};
+
+	const onMouseUp = () => {
+		isMouseDown = false;
+	};
+
+	const onMouseMove = (event: MouseEvent) => {
+		if (!isMouseDown) return;
+
+		event.preventDefault();
+
+		const x = event.pageX - (chartContainer?.offsetLeft ?? 0);
+		const y = event.pageY - (chartContainer?.offsetTop ?? 0);
+
+		const walkX = x - startX;
+		const walkY = y - startY;
+
+		if (chartContainer) {
+			console.log(scrollLeft - walkX);
+			chartContainer.scrollLeft = scrollLeft - walkX;
+			chartContainer.scrollTop = scrollTop - walkY;
+		}
+	};
 </script>
 
 <div class="editor-container">
@@ -73,11 +115,21 @@
 			><Download /></Button
 		>
 	</div>
-	<div class="chart-container">
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<div
+		class="chart-container"
+		role="region"
+		bind:this={chartContainer}
+		onmousedown={onMouseDown}
+		onmouseleave={onMouseLeave}
+		onmouseup={onMouseUp}
+		onmousemove={onMouseMove}
+		style={isMouseDown ? 'user-select: none;' : ''}
+	>
 		<Chart isEditor={true} bind:svgElement={svg} />
 	</div>
-	<div class="sidebar-container">
-		<SideBar style="width: 400px;" visible={true}>
+	<SideBar style="width: 400px;" visible={true}>
+		<div class="sidebar-container">
 			<div class="sidebar-content">
 				<div class="toolbar-input-container">
 					<Input
@@ -97,8 +149,8 @@
 					{/each}
 				</div>
 			</div>
-		</SideBar>
-	</div>
+		</div>
+	</SideBar>
 </div>
 
 <Dialog bind:visible={dialogVisible}>
@@ -154,12 +206,6 @@
 	}
 	.button-container {
 		margin-left: auto;
-	}
-	.sidebar-container {
-		display: flex;
-		flex-direction: column;
-		height: 100vh;
-		overflow: hidden;
 	}
 
 	.sidebar-content {
@@ -219,12 +265,20 @@
 		display: flex;
 		flex-direction: column;
 		gap: 20px;
-		width: 50px;
+		min-width: 50px;
 		background-color: #f1f1f1;
 		align-items: center;
 	}
 
 	.chart-container {
 		flex-grow: 1;
+		position: relative;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		min-width: 0;
+		max-height: 100dvh;
+		max-width: 100%;
 	}
 </style>

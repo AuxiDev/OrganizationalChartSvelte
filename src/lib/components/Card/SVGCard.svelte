@@ -48,7 +48,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		backdrop-filter: blur(1px);
+		backdrop-filter: blur(2px);
 		background-color: rgba(0, 0, 0, 0.1); "
 		>
 			<div style="width: 30px; height: 30px">
