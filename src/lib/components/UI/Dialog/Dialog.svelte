@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { type DialogContext } from '$types/dialog';
 	import { onMount, setContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	let {
 		visible = $bindable(false),
 		width = 400,
-		height = 300,
+		height = 0,
 		children,
 		...rest
 	}: { visible: boolean; width?: number; height?: number; children: any } = $props();
@@ -70,6 +69,5 @@
 		background-color: white;
 		border-radius: 10px;
 		margin: 0;
-		align-items: flex-end;
 	}
 </style>

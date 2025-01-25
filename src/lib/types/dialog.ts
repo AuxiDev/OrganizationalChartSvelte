@@ -1,4 +1,4 @@
-import type DialogV2 from '$lib/components/Dialog/Dialog.svelte';
+import type DialogV2 from '$lib/components/UI/Dialog/Dialog.svelte';
 
 export type DialogMenuTypeV2 = typeof DialogV2;
 

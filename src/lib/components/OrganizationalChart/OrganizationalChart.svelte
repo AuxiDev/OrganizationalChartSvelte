@@ -10,13 +10,13 @@
 	import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
 	import ContextMenu from '$lib/components/ContextMenu/index';
 	import { writable, get } from 'svelte/store';
-	import Dialog from '../Dialog/index';
+	import Dialog from '$lib/components/UI/Dialog/index';
 	import { assignIds } from '$lib/utils/helpers';
 	import { v4 as uuidv4 } from 'uuid';
-	import Input from '../UIElements/Input/Input.svelte';
-	import Button from '../UIElements/Button/Button.svelte';
-	import ImageInput from '../UIElements/ImageInput/ImageInput.svelte';
-	import SelectInput from '../UIElements/SelectInput/SelectInput.svelte';
+	import Input from '../UI/Input/Input.svelte';
+	import Button from '../UI/Button/Button.svelte';
+	import ImageInput from '../UI/ImageInput/ImageInput.svelte';
+	import SelectInput from '../UI/SelectInput/SelectInput.svelte';
 
 	let {
 		isEditor = false,

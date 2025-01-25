@@ -6,7 +6,7 @@
 		requiered = false,
 		...rest
 	} = $props<
-		{ value: string; requiered?: boolean } & Omit<
+		{ value?: string; requiered?: boolean } & Omit<
 			HTMLAttributes<HTMLInputElement>,
 			'value' | 'requiered'
 		>
@@ -30,7 +30,7 @@
 </script>
 
 <div class="input-file-container">
-	<div style="height: 70px;">
+	<div>
 		{#if imagePreview}
 			<div class="preview-container">
 				<!-- svelte-ignore a11y_img_redundant_alt -->
@@ -82,6 +82,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
 		border-radius: 10px;
 		background-color: #f0f4f8;
 	}
@@ -95,12 +96,12 @@
 	}
 
 	.image-preview {
-		width: 50px;
-		height: 50px;
+		width: 40px;
+		height: 40px;
 	}
 
 	.input-file {
-		height: 45px;
+		height: 40px;
 		position: relative;
 		display: flex;
 		flex-direction: row;
