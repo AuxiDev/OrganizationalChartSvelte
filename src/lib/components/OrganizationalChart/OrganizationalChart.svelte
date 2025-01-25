@@ -4,17 +4,29 @@
 	import { NodeStyles, type NodeLayout } from '$types/chart';
 	import { drawConnectedPath, drawListPath, drawTreePath } from '$lib/utils/drawLinePaths';
 	import SvgCard from '../Card/SVGCard.svelte';
-	import { ChartStore, removeNode } from '$lib/stores/ChartStore';
+	import { addNodeBelow, ChartStore, removeNode, updateNode } from '$lib/stores/ChartStore';
 	import { correctNegativePositioning, generatePositions } from '$lib/utils/positionCalculators';
+	import Input from '../UI/Input/Input.svelte';
+	import Button from '../UI/Button/Button.svelte';
+	import Dialog from '../UI/Dialog/Dialog.svelte';
+	import SelectInput from '../UI/SelectInput/SelectInput.svelte';
+	import { findPerson, personStore } from '$lib/stores/PersonStore';
 
 	let { isEditor = false }: { isEditor?: boolean } = $props();
 
 	let showContextMenu = $state(false);
+	let showDialog = $state(false);
+	let dialogMode: 'ADD' | 'EDIT' = 'ADD';
 	let contextMenuPosition = $state({ x: 0, y: 0 });
 	let svgHeight = $state(800);
 	let svgWidth = $state(800);
 	let svg: SVGSVGElement | null = $state(null);
 	let layout = writable<NodeLayout[]>();
+
+	let dialogPerson = $state('');
+	let dialogStyle = $state(NodeStyles.Tree);
+
+	// svelte-ignore non_reactive_update
 	let selectedNode: NodeLayout;
 	const nodeWidth = 200;
 	const nodeHeight = 80;
@@ -44,17 +56,17 @@
 		selectedNode = item;
 		showContextMenu = true;
 	};
-</script>
 
-{#if showContextMenu && isEditor}
-	<ContextMenu menuPosition={contextMenuPosition} bind:visible={showContextMenu}>
-		<ContextMenu.Item>Add Node</ContextMenu.Item>
-		<ContextMenu.Item>Edit Node</ContextMenu.Item>
-		<ContextMenu.Item onaction={() => removeNode(selectedNode.node.id ?? '')}
-			>Delete Node</ContextMenu.Item
-		>
-	</ContextMenu>
-{/if}
+	const updateSelectedNode = () => {
+		if (dialogMode === 'ADD') {
+			addNodeBelow(selectedNode.node.id, findPerson(dialogPerson), dialogStyle);
+		} else {
+			updateNode(selectedNode.node.id, dialogStyle, findPerson(dialogPerson));
+		}
+
+		showDialog = false;
+	};
+</script>
 
 <svg
 	xmlns="http://www.w3.org/2000/svg"
@@ -116,3 +128,96 @@
 		</foreignObject>
 	{/each}
 </svg>
+
+{#if showContextMenu && isEditor}
+	<ContextMenu menuPosition={contextMenuPosition} bind:visible={showContextMenu}>
+		<ContextMenu.Item
+			onaction={() => {
+				dialogMode = 'ADD';
+				dialogPerson = '';
+				dialogStyle = NodeStyles.Tree;
+				showDialog = true;
+			}}>Add Node</ContextMenu.Item
+		>
+		<ContextMenu.Item
+			onaction={() => {
+				dialogMode = 'EDIT';
+				dialogPerson = selectedNode.node.person.id;
+				dialogStyle = selectedNode.node.style;
+				showDialog = true;
+			}}>Edit Node</ContextMenu.Item
+		>
+		<ContextMenu.Item onaction={() => removeNode(selectedNode.node.id ?? '')}
+			>Delete Node</ContextMenu.Item
+		>
+	</ContextMenu>
+{/if}
+
+{#if isEditor}
+	<Dialog bind:visible={showDialog}>
+		<div class="dialog-content">
+			{#if dialogMode === 'ADD'}
+				<h1 class="dialog-title">Adding new Node</h1>
+			{:else}
+				<h1 class="dialog-title">
+					Currently editing: <span class="dialog-subtitle"
+						>&nbsp;{selectedNode.node.person.name}</span
+					>
+				</h1>
+			{/if}
+			<form onsubmit={updateSelectedNode} class="input-container">
+				<SelectInput bind:value={dialogPerson} style="width: 100%" label="Person" requiered>
+					{#each $personStore as person}
+						<option value={person.id}>{person.name}</option>
+					{/each}
+				</SelectInput>
+				<SelectInput bind:value={dialogStyle} style="width: 100%" label="Style" requiered>
+					<option value={NodeStyles.Tree}>Tree</option>
+					<option value={NodeStyles.Connected}>Connected</option>
+					<option value={NodeStyles.List}>List</option>
+				</SelectInput>
+				<div class="button-container">
+					<Button variant="primary" type="submit">Save</Button>
+					<Button
+						onclick={() => {
+							showDialog = false;
+						}}
+						variant="secondary"
+						type="submit">Cancel</Button
+					>
+				</div>
+			</form>
+		</div>
+	</Dialog>
+{/if}
+
+<style>
+	.input-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-self: flex-end;
+		align-items: flex-end;
+		margin-right: 20px;
+		gap: 20px;
+		margin-top: 20px;
+	}
+	.dialog-title {
+		display: flex;
+		font-size: 20px;
+		line-height: 30px;
+	}
+	.dialog-subtitle {
+		color: #666;
+	}
+	.dialog-content {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 100%;
+		padding: 20px;
+	}
+	.button-container {
+		margin-left: auto;
+	}
+</style>

@@ -10,7 +10,6 @@
 	} = $props<
 		{
 			label?: string;
-			style?: string;
 			requiered?: boolean;
 			children: any;
 			value?: any;
@@ -47,7 +46,7 @@
 		font-size: 16px;
 		border-radius: 5px;
 		border: 1px solid #ccc;
+		transition: all 0.3s ease;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-		margin: 0;
 	}
 </style>

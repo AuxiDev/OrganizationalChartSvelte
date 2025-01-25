@@ -28,4 +28,8 @@ const createPerson = (name: string, description?: string, image?: string) => {
 	});
 };
 
-export { editPerson, deletePerson, createPerson, personStore };
+const findPerson = (id: string) => {
+	return get(personStore).filter((person) => person.id !== id)[0];
+};
+
+export { editPerson, deletePerson, createPerson, personStore, findPerson };

@@ -138,15 +138,18 @@ const findChartNode = (node: ChartNode, id: string): ChartNode | undefined => {
 };
 
 const addNodeBelow = (nodeID: string, personToAdd: ChartPerson, style?: NodeStyles) => {
-	let foundPerson = findChartNode(get(ChartStore), nodeID);
-	if (foundPerson) {
-		foundPerson.children.push({
-			id: uuidv4(),
-			person: personToAdd,
-			style: style ?? NodeStyles.Tree,
-			children: []
-		});
-	}
+	ChartStore.update((data) => {
+		let foundPerson = findChartNode(get(ChartStore), nodeID);
+		if (foundPerson) {
+			foundPerson.children.push({
+				id: uuidv4(),
+				person: personToAdd,
+				style: style ?? NodeStyles.Tree,
+				children: []
+			});
+		}
+		return data;
+	});
 };
 
 const removeNode = (nodeID: string) => {
@@ -169,4 +172,16 @@ const removeNode = (nodeID: string) => {
 	ChartStore.set(rootNode);
 };
 
-export { ChartStore, addNodeBelow, removeNode };
+const updateNode = (nodeID: string, style: NodeStyles, person: ChartPerson) => {
+	ChartStore.update((data) => {
+		const nodeToEdit = findChartNode(get(ChartStore), nodeID);
+		if (nodeToEdit) {
+			nodeToEdit.person = person;
+			nodeToEdit.style = style;
+		}
+
+		return data;
+	});
+};
+
+export { ChartStore, addNodeBelow, removeNode, updateNode };
