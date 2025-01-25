@@ -6,15 +6,15 @@
 	import { get } from 'svelte/store';
 	import Input from '../UI/Input/Input.svelte';
 	import Button from '../UI/Button/Button.svelte';
-	import ArrowRight from '../Icons/ArrowRight/ArrowRight.svelte';
 	import Save from '../Icons/Save/Save.svelte';
 	import Download from '../Icons/Download/Download.svelte';
 	import Dialog from '../UI/Dialog/Dialog.svelte';
 	import ImageInput from '../UI/ImageInput/ImageInput.svelte';
-	import Chart from '../OrganizationalChart/OrganizationalChart.svelte';
+	import Chart from './Chart/Chart.svelte';
 	import { addActionToHistory, redoAction, undoAction } from '$lib/stores/HistoryStore';
 	import Undo from '../Icons/Undo/Undo.svelte';
 	import Redo from '../Icons/Redo/Redo.svelte';
+	import Tooltip from '../UI/Tooltip/Tooltip.svelte';
 
 	createPerson('Mia', 'CEO', 'https://placehold.co/50x50');
 	createPerson('Lola', 'CFO', 'https://placehold.co/50x50');
@@ -112,16 +112,26 @@
 
 <div class="editor-container">
 	<div class="toolbar-container">
-		<Button style="height: 30px; width: 30px; margin-top: 20px" variant="ghost"><Save /></Button>
-		<Button style="height: 30px; width: 30px" variant="ghost" onclick={downloadSVG}
-			><Download /></Button
-		>
-		<Button style="height: 30px; width: 30px" variant="ghost" onclick={() => undoAction()}
-			><Undo /></Button
-		>
-		<Button style="height: 30px; width: 30px" variant="ghost" onclick={() => redoAction()}
-			><Redo /></Button
-		>
+		<div class="toolbar-items">
+			<Tooltip text="Save as file">
+				<Button style="height: 30px; width: 30px;" variant="ghost"><Save /></Button>
+			</Tooltip>
+			<Tooltip text="Download as SVG">
+				<Button style="height: 30px; width: 30px" variant="ghost" onclick={downloadSVG}
+					><Download /></Button
+				>
+			</Tooltip>
+			<Tooltip text="Undo">
+				<Button style="height: 30px; width: 30px" variant="ghost" onclick={() => undoAction()}
+					><Undo /></Button
+				>
+			</Tooltip>
+			<Tooltip text="Redo">
+				<Button style="height: 30px; width: 30px" variant="ghost" onclick={() => redoAction()}
+					><Redo /></Button
+				>
+			</Tooltip>
+		</div>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
@@ -272,12 +282,20 @@
 	}
 
 	.toolbar-container {
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
+		max-width: 50px;
 		min-width: 50px;
 		background-color: #f1f1f1;
+	}
+
+	.toolbar-items {
+		display: flex;
+		flex-direction: column;
 		align-items: center;
+		gap: 20px;
+	}
+
+	.toolbar-items:nth-child(1) {
+		margin-top: 20px;
 	}
 
 	.chart-container {

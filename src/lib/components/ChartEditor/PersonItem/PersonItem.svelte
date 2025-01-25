@@ -5,6 +5,7 @@
 	import Dialog from '$lib/components/UI/Dialog/Dialog.svelte';
 	import ImageInput from '$lib/components/UI/ImageInput/ImageInput.svelte';
 	import Input from '$lib/components/UI/Input/Input.svelte';
+	import Tooltip from '$lib/components/UI/Tooltip/Tooltip.svelte';
 	import { addActionToHistory } from '$lib/stores/HistoryStore';
 	import { deletePerson, editPerson } from '$lib/stores/PersonStore';
 	import type { ChartPerson } from '$types/chart';
@@ -58,17 +59,21 @@
 		<p class="person-description">{person.description}</p>
 	</div>
 	<div class="button-container">
-		<Button onclick={() => (editVisible = true)} variant="ghost" style="height: 30px; width: 30px"
-			><Pencil /></Button
-		>
-		<Button
-			onclick={() => {
-				deletePerson(person.id);
-				addActionToHistory({ type: 'deletePerson', data: person });
-			}}
-			variant="ghost"
-			style="height: 30px; width: 30px"><Trash /></Button
-		>
+		<Tooltip text="Edit">
+			<Button onclick={() => (editVisible = true)} variant="ghost" style="height: 30px; width: 30px"
+				><Pencil /></Button
+			>
+		</Tooltip>
+		<Tooltip text="Delete">
+			<Button
+				onclick={() => {
+					deletePerson(person.id);
+					addActionToHistory({ type: 'deletePerson', data: person });
+				}}
+				variant="ghost"
+				style="height: 30px; width: 30px"><Trash /></Button
+			>
+		</Tooltip>
 	</div>
 </div>
 
