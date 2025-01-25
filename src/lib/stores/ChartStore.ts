@@ -137,19 +137,54 @@ const findChartNode = (node: ChartNode, id: string): ChartNode | undefined => {
 	return undefined;
 };
 
-const addNodeBelow = (nodeID: string, personToAdd: ChartPerson, style?: NodeStyles) => {
+const addNodeBelow = (
+	nodeID: string,
+	personToAdd: ChartPerson,
+	style?: NodeStyles,
+	id?: string,
+	children?: ChartNode[]
+) => {
+	let createdNode = {
+		id: id ? id : uuidv4(),
+		person: personToAdd,
+		style: style ?? NodeStyles.Tree,
+		children: children ? children : []
+	};
 	ChartStore.update((data) => {
 		let foundPerson = findChartNode(get(ChartStore), nodeID);
 		if (foundPerson) {
-			foundPerson.children.push({
-				id: uuidv4(),
-				person: personToAdd,
-				style: style ?? NodeStyles.Tree,
-				children: []
-			});
+			foundPerson.children.push(createdNode);
 		}
 		return data;
 	});
+
+	return createdNode;
+};
+
+const addNodeBelowAtPositon = (
+	nodeID: string,
+	personToAdd: ChartPerson,
+	style?: NodeStyles,
+	id?: string,
+	children?: ChartNode[],
+	position: number = 0
+) => {
+	let createdNode = {
+		id: id ? id : uuidv4(),
+		person: personToAdd,
+		style: style ?? NodeStyles.Tree,
+		children: children ? children : []
+	};
+
+	ChartStore.update((data) => {
+		let foundPerson = findChartNode(get(ChartStore), nodeID);
+		if (foundPerson) {
+			foundPerson.children.splice(position, 0, createdNode);
+		}
+		return data;
+	});
+
+	return createdNode;
 };
 
 const removeNode = (nodeID: string) => {
@@ -184,4 +219,31 @@ const updateNode = (nodeID: string, style: NodeStyles, person: ChartPerson) => {
 	});
 };
 
-export { ChartStore, addNodeBelow, removeNode, updateNode };
+const findParentNodeWithIndex = (
+	node: ChartNode,
+	id: string
+): { parent: ChartNode; childIndex: number } | undefined => {
+	for (let i = 0; i < node.children.length; i++) {
+		if (node.children[i].id === id) {
+			return { parent: node, childIndex: i };
+		}
+		const foundParent = findParentNodeWithIndex(node.children[i], id);
+		if (foundParent) {
+			return foundParent;
+		}
+	}
+	return undefined;
+};
+
+const findParentByIdWithIndex = (nodeID: string) => {
+	return findParentNodeWithIndex(get(ChartStore), nodeID);
+};
+
+export {
+	ChartStore,
+	addNodeBelow,
+	removeNode,
+	updateNode,
+	findParentByIdWithIndex,
+	addNodeBelowAtPositon
+};

@@ -1,4 +1,4 @@
-import { type NodeLayout, type OrgNodeItem, NodeStyles } from '$types/chart';
+import { type NodeLayout, NodeStyles } from '$types/chart';
 
 function drawTreePath(
 	parentX: number,

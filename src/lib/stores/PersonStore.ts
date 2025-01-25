@@ -5,8 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 const personStore = writable<ChartPerson[]>([]);
 
 const editPerson = (id: string, newData: ChartPerson) => {
+	let personToEdit;
 	personStore.update((persons) => {
-		let personToEdit = persons.find((person) => person.id === id);
+		personToEdit = persons.find((person) => person.id === id);
 		if (personToEdit) {
 			personToEdit.name = newData.name;
 			personToEdit.description = newData.description;
@@ -15,17 +16,22 @@ const editPerson = (id: string, newData: ChartPerson) => {
 
 		return persons;
 	});
+
+	return personToEdit;
 };
 
 const deletePerson = (id: string) => {
 	personStore.update((persons) => persons.filter((person) => person.id !== id));
 };
 
-const createPerson = (name: string, description?: string, image?: string) => {
+const createPerson = (name: string, description?: string, image?: string, id?: string) => {
+	let createdPerson = { id: id ? id : uuidv4(), name, description, image };
 	personStore.update((persons) => {
-		persons.push({ id: uuidv4(), name, description, image });
+		persons.push(createdPerson);
 		return persons;
 	});
+
+	return createdPerson;
 };
 
 const findPerson = (id: string) => {

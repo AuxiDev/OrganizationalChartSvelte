@@ -4,13 +4,20 @@
 	import { NodeStyles, type NodeLayout } from '$types/chart';
 	import { drawConnectedPath, drawListPath, drawTreePath } from '$lib/utils/drawLinePaths';
 	import SvgCard from '../Card/SVGCard.svelte';
-	import { addNodeBelow, ChartStore, removeNode, updateNode } from '$lib/stores/ChartStore';
+	import {
+		addNodeBelow,
+		ChartStore,
+		findParentByIdWithIndex,
+		removeNode,
+		updateNode
+	} from '$lib/stores/ChartStore';
 	import { correctNegativePositioning, generatePositions } from '$lib/utils/positionCalculators';
 	import Button from '../UI/Button/Button.svelte';
 	import Dialog from '../UI/Dialog/Dialog.svelte';
 	import SelectInput from '../UI/SelectInput/SelectInput.svelte';
 	import { findPerson, personStore } from '$lib/stores/PersonStore';
 	import { onMount } from 'svelte';
+	import { addActionToHistory } from '$lib/stores/HistoryStore';
 
 	let {
 		isEditor = false,
@@ -67,12 +74,38 @@
 
 	const updateSelectedNode = () => {
 		if (dialogMode === 'ADD') {
-			addNodeBelow(selectedNode.node.id, findPerson(dialogPerson), dialogStyle);
+			let createdNode = addNodeBelow(selectedNode.node.id, findPerson(dialogPerson), dialogStyle);
+			addActionToHistory({
+				type: 'addNode',
+				parentID: selectedNode.node.id,
+				data: createdNode
+			});
 		} else {
+			// Make sure selectedNode in History isn't affected by the updateNode change
+			let dataOld = JSON.parse(JSON.stringify(selectedNode.node));
 			updateNode(selectedNode.node.id, dialogStyle, findPerson(dialogPerson));
+			addActionToHistory({
+				type: 'editNode',
+				dataOld: dataOld,
+				dataNew: JSON.parse(JSON.stringify(selectedNode.node))
+			});
 		}
 
 		showDialog = false;
+	};
+
+	const deleteNodeAction = () => {
+		const result = findParentByIdWithIndex(selectedNode.node.id);
+		if (result) {
+			addActionToHistory({
+				type: 'deleteNode',
+				position: result.childIndex,
+				parentID: result.parent.id,
+				data: selectedNode.node
+			});
+		}
+
+		removeNode(selectedNode.node.id ?? '');
 	};
 </script>
 
@@ -157,9 +190,7 @@
 				showDialog = true;
 			}}>Edit Node</ContextMenu.Item
 		>
-		<ContextMenu.Item onaction={() => removeNode(selectedNode.node.id ?? '')}
-			>Delete Node</ContextMenu.Item
-		>
+		<ContextMenu.Item onaction={deleteNodeAction}>Delete Node</ContextMenu.Item>
 	</ContextMenu>
 {/if}
 
@@ -229,5 +260,8 @@
 	}
 	.button-container {
 		margin-left: auto;
+		display: flex;
+		flex-direction: row;
+		gap: 20px;
 	}
 </style>

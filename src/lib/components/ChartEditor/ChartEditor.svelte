@@ -12,6 +12,9 @@
 	import Dialog from '../UI/Dialog/Dialog.svelte';
 	import ImageInput from '../UI/ImageInput/ImageInput.svelte';
 	import Chart from '../OrganizationalChart/OrganizationalChart.svelte';
+	import { addActionToHistory, redoAction, undoAction } from '$lib/stores/HistoryStore';
+	import Undo from '../Icons/Undo/Undo.svelte';
+	import Redo from '../Icons/Redo/Redo.svelte';
 
 	createPerson('Mia', 'CEO', 'https://placehold.co/50x50');
 	createPerson('Lola', 'CFO', 'https://placehold.co/50x50');
@@ -55,12 +58,12 @@
 
 	const addPerson = () => {
 		dialogVisible = false;
-		createPerson(personName, personDescription, personImage);
+		let createdPerson = createPerson(personName, personDescription, personImage);
 		resetInputs();
+		addActionToHistory({ type: 'addPerson', data: createdPerson });
 	};
 
 	const downloadSVG = () => {
-		console.log(svg);
 		if (!svg) return;
 		const svgData = new XMLSerializer().serializeToString(svg);
 		const blob = new Blob([svgData], { type: 'image/svg+xml' });
@@ -101,7 +104,6 @@
 		const walkY = y - startY;
 
 		if (chartContainer) {
-			console.log(scrollLeft - walkX);
 			chartContainer.scrollLeft = scrollLeft - walkX;
 			chartContainer.scrollTop = scrollTop - walkY;
 		}
@@ -113,6 +115,12 @@
 		<Button style="height: 30px; width: 30px; margin-top: 20px" variant="ghost"><Save /></Button>
 		<Button style="height: 30px; width: 30px" variant="ghost" onclick={downloadSVG}
 			><Download /></Button
+		>
+		<Button style="height: 30px; width: 30px" variant="ghost" onclick={() => undoAction()}
+			><Undo /></Button
+		>
+		<Button style="height: 30px; width: 30px" variant="ghost" onclick={() => redoAction()}
+			><Redo /></Button
 		>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -165,7 +173,7 @@
 				requiered
 			/>
 			<ImageInput bind:value={personImage} />
-			<div class="button-container">
+			<div class="button-container" style="gap: 20px;">
 				<Button variant="primary" type="submit">Save</Button>
 				<Button
 					onclick={() => {
@@ -188,8 +196,8 @@
 		align-self: flex-end;
 		align-items: flex-end;
 		margin-right: 20px;
+		margin-top: 20px;
 		gap: 20px;
-		margin-top: 0px;
 	}
 	.dialog-title {
 		display: flex;
@@ -205,6 +213,8 @@
 		padding: 20px;
 	}
 	.button-container {
+		display: flex;
+		flex-direction: row;
 		margin-left: auto;
 	}
 

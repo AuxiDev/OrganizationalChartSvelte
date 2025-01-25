@@ -5,6 +5,7 @@
 	import Dialog from '$lib/components/UI/Dialog/Dialog.svelte';
 	import ImageInput from '$lib/components/UI/ImageInput/ImageInput.svelte';
 	import Input from '$lib/components/UI/Input/Input.svelte';
+	import { addActionToHistory } from '$lib/stores/HistoryStore';
 	import { deletePerson, editPerson } from '$lib/stores/PersonStore';
 	import type { ChartPerson } from '$types/chart';
 	import { type PersonViewerContext } from '$types/misc';
@@ -19,11 +20,19 @@
 
 	const saveChanges = () => {
 		editVisible = false;
-		editPerson(person.id, {
+		// Make sure person in History isn't affected by the updateNode change
+		let dataOld: ChartPerson = JSON.parse(JSON.stringify(person));
+		let editedPerson = editPerson(person.id, {
 			id: '',
 			name: personName,
 			description: personDescription,
 			image: personImage
+		});
+
+		addActionToHistory({
+			type: 'editPerson',
+			dataOld: dataOld,
+			dataNew: JSON.parse(JSON.stringify(editedPerson))
 		});
 
 		resetInputs();
@@ -53,7 +62,10 @@
 			><Pencil /></Button
 		>
 		<Button
-			onclick={() => deletePerson(person.id)}
+			onclick={() => {
+				deletePerson(person.id);
+				addActionToHistory({ type: 'deletePerson', data: person });
+			}}
 			variant="ghost"
 			style="height: 30px; width: 30px"><Trash /></Button
 		>
@@ -74,7 +86,7 @@
 				requiered
 			/>
 			<ImageInput bind:value={personImage} />
-			<div class="button-container">
+			<div class="button-container" style="gap: 20px;">
 				<Button variant="primary" type="submit">Save</Button>
 				<Button
 					onclick={() => {
@@ -117,6 +129,8 @@
 	}
 	.button-container {
 		margin-left: auto;
+		display: flex;
+		flex-direction: row;
 	}
 
 	.item-container {
