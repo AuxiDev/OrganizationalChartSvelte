@@ -10,7 +10,7 @@
 	import Download from '../Icons/Download/Download.svelte';
 	import Dialog from '../UI/Dialog/Dialog.svelte';
 	import ImageInput from '../UI/ImageInput/ImageInput.svelte';
-	import Chart from './Chart/Chart.svelte';
+	import Chart from './EditorChart/EditorChart.svelte';
 	import { addActionToHistory, redoAction, undoAction } from '$lib/stores/HistoryStore';
 	import Undo from '../Icons/Undo/Undo.svelte';
 	import Redo from '../Icons/Redo/Redo.svelte';
