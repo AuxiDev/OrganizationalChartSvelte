@@ -4,6 +4,7 @@
 	let {
 		label,
 		value = $bindable(),
+		maxlength = 25,
 		requiered = false,
 		...rest
 	} = $props<
@@ -11,6 +12,7 @@
 			label?: string;
 			style?: string;
 			requiered?: boolean;
+			maxlength?: number;
 			value?: any;
 		} & Omit<HTMLAttributes<HTMLInputElement>, 'value' | 'requiered'>
 	>();
@@ -20,7 +22,7 @@
 	{#if label}
 		<label for="input">{label}</label>
 	{/if}
-	<input required={requiered} bind:value {...rest} />
+	<input {maxlength} required={requiered} bind:value {...rest} />
 </div>
 
 <style>
