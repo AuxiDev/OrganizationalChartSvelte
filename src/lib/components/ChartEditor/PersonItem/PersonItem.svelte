@@ -57,7 +57,9 @@
 		}
 
 		for (let child of node.children) {
-			return isPersonInChart(child, id);
+			if (isPersonInChart(child, id)) {
+				return true;
+			}
 		}
 
 		return false;
