@@ -201,14 +201,17 @@
 		ondrop={(event) => handleDrop(event, item, position)}
 	>
 		<div
-			style="position: absolute; {position === 'BELOW'
+			style="position: absolute;   top: 50%;
+    		transform: translateY(-50%); {position === 'BELOW'
 				? 'left: 0; right: 0; margin-inline: auto;'
 				: position === 'LEFT'
 					? 'left: 20px;'
-					: 'left: 0px;'} width: 30px; height: 100%; display: flex; justify-content: center; align-items: center;"
+					: 'left: 0px;'} width: 30px; border-radius: 50%; height: 30px; display: flex; justify-content: center; align-items: center;background-color: rgba(255,255,255, 0.5);"
 			role="region"
 		>
-			<Add />
+			<div style="width: 30px; height: 30px">
+				<Add />
+			</div>
 		</div>
 	</foreignObject>
 {/snippet}

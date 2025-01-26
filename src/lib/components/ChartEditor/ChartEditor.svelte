@@ -44,21 +44,22 @@
 
 	let chartContainer: HTMLDivElement | null = $state(null);
 
+	const textSearchChanged = () => {
+		const allPersons = get(personStore);
+		filteredPersons = allPersons.filter((person) =>
+			person.name.toLowerCase().includes(textSearch.toLowerCase())
+		);
+	};
+
 	personStore.subscribe((state) => {
 		filteredPersons = state;
+		textSearchChanged();
 	});
 
 	const resetInputs = () => {
 		personName = '';
 		personDescription = '';
 		personImage = '';
-	};
-
-	const textSearchChanged = () => {
-		const allPersons = get(personStore);
-		filteredPersons = allPersons.filter((person) =>
-			person.name.toLowerCase().includes(textSearch.toLowerCase())
-		);
 	};
 
 	const addPerson = () => {
