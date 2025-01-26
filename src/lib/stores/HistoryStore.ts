@@ -6,7 +6,7 @@ import { addNodeBelow, addNodeBelowAtPositon, removeNode, updateNode } from './C
 type ActionMetaData = { unDone: boolean; reDone: boolean };
 
 type Action =
-	| { type: 'addNode'; parentID: string; data: ChartNode; meta?: ActionMetaData }
+	| { type: 'addNode'; parentID: string; data: ChartNode; position: number; meta?: ActionMetaData }
 	| { type: 'editNode'; dataOld: ChartNode; dataNew: ChartNode; meta?: ActionMetaData }
 	| {
 			type: 'deleteNode';
@@ -34,14 +34,26 @@ const addActionToHistory = (action: Action) => {
 const applyAction = (action: Action) => {
 	switch (action.type) {
 		case 'addNode':
-			addNodeBelow(
-				action.parentID,
-				action.data.person,
-				action.data.style,
-				action.data.css,
-				action.data.id,
-				action.data.children
-			);
+			if (action.position === -1) {
+				addNodeBelow(
+					action.parentID,
+					action.data.person,
+					action.data.style,
+					action.data.css,
+					action.data.id,
+					action.data.children
+				);
+			} else {
+				addNodeBelowAtPositon(
+					action.parentID,
+					action.data.person,
+					action.data.style,
+					action.data.id,
+					action.data.children,
+					action.data.css,
+					action.position
+				);
+			}
 			break;
 		case 'deleteNode':
 			removeNode(action.data.id);

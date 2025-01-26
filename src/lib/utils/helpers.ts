@@ -1,7 +1,7 @@
-import type { OrgNodeItem } from '$types/chart';
+import type { ChartNode } from '$types/chart';
 import { v4 as uuidv4 } from 'uuid';
 
-const assignIds = (node: OrgNodeItem) => {
+const assignIds = (node: ChartNode) => {
 	if (!node.id) {
 		node.id = uuidv4();
 	}

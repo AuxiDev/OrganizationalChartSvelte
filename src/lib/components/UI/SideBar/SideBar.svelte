@@ -11,10 +11,9 @@
 		...rest
 	} = $props<{ visible: boolean; children?: any } & HTMLAttributes<HTMLDivElement>>();
 
-	let sidebarWidth: number = $state(0); // To store the current sidebar width
+	let sidebarWidth: number = $state(0);
 	let sidebarRef: HTMLDivElement | null = $state(null);
 
-	// Update the sidebar width when it changes
 	onMount(() => {
 		const updateSidebarWidth = () => {
 			if (sidebarRef) {
@@ -22,7 +21,6 @@
 			}
 		};
 
-		// Initialize the width when the component mounts
 		updateSidebarWidth();
 
 		window.addEventListener('resize', updateSidebarWidth);
@@ -63,11 +61,8 @@
 
 	.sidebar-menu {
 		height: 100%;
-		width: 250px; /* Default width can be overwritten via style */
+		width: 250px;
 		background-color: #f1f1f1;
 		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 	}
-
-	/* Optional: Style the button */
-	/* Button styles are included in the button component already */
 </style>

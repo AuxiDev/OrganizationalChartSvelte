@@ -4,7 +4,7 @@
 	import { updateNode } from '$lib/stores/ChartStore';
 	import { addActionToHistory } from '$lib/stores/HistoryStore';
 	import { findPerson } from '$lib/stores/PersonStore';
-	import type { ChartNode, NodeLayout } from '$types/chart';
+	import type { ChartNode, ChartPerson, NodeLayout } from '$types/chart';
 	import Replace from '../Icons/Replace/Replace.svelte';
 
 	let {
@@ -16,10 +16,9 @@
 	let isDragOver = $state(false);
 
 	const handleDrop = (event: DragEvent) => {
-		const personID = event.dataTransfer?.getData('personID');
-		let person = findPerson(personID ?? '');
+		const person: ChartPerson = JSON.parse(event.dataTransfer?.getData('person') ?? '');
 		let dataOld: ChartNode = JSON.parse(JSON.stringify(data));
-		updateNode(data.id, data.style, person);
+		updateNode(data.id, data.style, findPerson(person.id));
 
 		addActionToHistory({
 			type: 'editNode',

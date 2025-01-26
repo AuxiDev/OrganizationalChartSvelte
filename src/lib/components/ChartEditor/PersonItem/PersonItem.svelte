@@ -9,8 +9,6 @@
 	import { addActionToHistory } from '$lib/stores/HistoryStore';
 	import { deletePerson, editPerson } from '$lib/stores/PersonStore';
 	import type { ChartPerson } from '$types/chart';
-	import { type PersonViewerContext } from '$types/misc';
-	import { getContext } from 'svelte';
 
 	let { person }: { person: ChartPerson } = $props();
 	let personName = $state(person.name);
@@ -40,7 +38,7 @@
 	};
 
 	const handleDragStart = (event: DragEvent) => {
-		event.dataTransfer?.setData('personID', person.id);
+		event.dataTransfer?.setData('person', JSON.stringify(person));
 	};
 
 	const resetInputs = () => {

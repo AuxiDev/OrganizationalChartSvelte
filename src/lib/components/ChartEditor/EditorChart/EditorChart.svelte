@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { get, writable } from 'svelte/store';
 	import ContextMenu from '$lib/components/UI/ContextMenu/index';
-	import { NodeStyles, type NodeLayout } from '$types/chart';
+	import { NodeStyles, type ChartNode, type ChartPerson, type NodeLayout } from '$types/chart';
 	import { drawConnectedPath, drawListPath, drawTreePath } from '$lib/utils/drawLinePaths';
 	import SvgCard from '$lib/components/Card/SVGCard.svelte';
 	import {
 		addNodeBelow,
+		addNodeBelowAtPositon,
 		ChartStore,
 		findParentByIdWithIndex,
 		removeNode,
@@ -20,6 +21,7 @@
 	import { addActionToHistory } from '$lib/stores/HistoryStore';
 	import Input from '$lib/components/UI/Input/Input.svelte';
 	import ColorInput from '$lib/components/UI/ColorInput/ColorInput.svelte';
+	import Add from '$lib/components/UI/Add/Add.svelte';
 
 	let {
 		isEditor = false,
@@ -41,6 +43,8 @@
 	let dialogBGColor = $state('');
 	let dialogTextColor = $state('');
 
+	let isDragging = $state(false);
+
 	// svelte-ignore non_reactive_update
 	let selectedNode: NodeLayout;
 	const nodeWidth = 200;
@@ -51,7 +55,7 @@
 		svgElement = svg;
 	});
 
-	ChartStore.subscribe(() => {
+	const updateLayout = () => {
 		let generatedNodeLayout = generatePositions(
 			get(ChartStore),
 			900,
@@ -67,6 +71,13 @@
 		svgHeight = Math.max(...generatedNodeLayout.map((node) => node.positionY)) + nodeHeight;
 
 		layout.set(generatedNodeLayout);
+	};
+	ChartStore.subscribe(() => {
+		updateLayout();
+	});
+
+	personStore.subscribe(() => {
+		updateLayout();
 	});
 
 	const openContextMenu = (event: MouseEvent, item: NodeLayout) => {
@@ -85,7 +96,8 @@
 			addActionToHistory({
 				type: 'addNode',
 				parentID: selectedNode.node.id,
-				data: createdNode
+				data: createdNode,
+				position: -1
 			});
 		} else {
 			// Make sure selectedNode in History isn't affected by the updateNode change
@@ -118,9 +130,97 @@
 
 		removeNode(selectedNode.node.id ?? '');
 	};
+
+	const handleDrop = (event: DragEvent, item: NodeLayout, position: 'LEFT' | 'RIGHT' | 'BELOW') => {
+		const data: ChartPerson = JSON.parse(event.dataTransfer?.getData('person') ?? '');
+		const personToAdd = findPerson(data.id);
+		let createdNode: ChartNode;
+		isDragging = false;
+
+		if (position === 'BELOW') {
+			createdNode = addNodeBelow(item.node.id, personToAdd);
+			addActionToHistory({
+				type: 'addNode',
+				parentID: item.node.id,
+				data: createdNode,
+				position: -1
+			});
+			return;
+		}
+
+		let result = findParentByIdWithIndex(item.node.id);
+		if (result) {
+			let nodePosition: number = position === 'LEFT' ? result?.childIndex : result?.childIndex + 1;
+			createdNode = addNodeBelowAtPositon(
+				result?.parent.id,
+				personToAdd,
+				NodeStyles.Tree,
+				undefined,
+				[],
+				undefined,
+				nodePosition
+			);
+
+			console.log(get(layout));
+			addActionToHistory({
+				type: 'addNode',
+				parentID: result.parent.id,
+				data: createdNode,
+				position: nodePosition
+			});
+		}
+	};
+
+	const handleDragLeave = (event: any) => {
+		if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+			isDragging = false;
+		}
+	};
 </script>
 
-<div>
+{#snippet DropZone({
+	width,
+	height,
+	x,
+	y,
+	position,
+	item
+}: {
+	width: number;
+	height: number;
+	x: number;
+	y: number;
+	position: 'LEFT' | 'RIGHT' | 'BELOW';
+	item: NodeLayout;
+})}
+	<foreignObject
+		{width}
+		{height}
+		{x}
+		{y}
+		role="region"
+		ondrop={(event) => handleDrop(event, item, position)}
+	>
+		<div
+			style="position: absolute; {position === 'BELOW'
+				? 'left: 0; right: 0; margin-inline: auto;'
+				: position === 'LEFT'
+					? 'left: 20px;'
+					: 'left: 0px;'} width: 30px; height: 100%; display: flex; justify-content: center; align-items: center;"
+			role="region"
+		>
+			<Add />
+		</div>
+	</foreignObject>
+{/snippet}
+
+<div
+	role="region"
+	ondragenter={() => (isDragging = true)}
+	ondragleave={handleDragLeave}
+	ondragover={(event) => event.preventDefault()}
+	ondrop={() => (isDragging = false)}
+>
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		bind:this={svg}
@@ -168,7 +268,37 @@
 			{/if}
 		{/each}
 
-		{#each $layout as item}
+		{#each $layout as item, index}
+			{#if isDragging && index !== 0}
+				{@render DropZone({
+					width: 50,
+					height: nodeHeight,
+					x: item.positionX - 50 - item.width / 2,
+					y: item.positionY - item.height / 2,
+					position: 'LEFT',
+					item: item
+				})}
+
+				{@render DropZone({
+					width: 50,
+					height: nodeHeight,
+					x: item.positionX + nodeWidth - item.width / 2,
+					y: item.positionY - item.height / 2,
+					position: 'RIGHT',
+					item: item
+				})}
+
+				{#if item.node.children.length === 0}
+					{@render DropZone({
+						width: nodeWidth,
+						height: nodeHeight,
+						x: item.positionX - item.width / 2,
+						y: item.positionY + 60 - item.height / 2,
+						position: 'BELOW',
+						item: item
+					})}
+				{/if}
+			{/if}
 			<foreignObject
 				x={item.positionX - item.width / 2}
 				y={item.positionY - item.height / 2}
