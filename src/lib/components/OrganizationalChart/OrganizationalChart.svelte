@@ -12,10 +12,6 @@
 		updateNode
 	} from '$lib/stores/ChartStore';
 	import { correctNegativePositioning, generatePositions } from '$lib/utils/positionCalculators';
-	import Button from '../UI/Button/Button.svelte';
-	import Dialog from '../UI/Dialog/Dialog.svelte';
-	import SelectInput from '../UI/SelectInput/SelectInput.svelte';
-
 	let svgHeight = $state(800);
 	let svgWidth = $state(800);
 	let layout = writable<NodeLayout[]>();

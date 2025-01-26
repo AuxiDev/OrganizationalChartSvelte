@@ -18,6 +18,8 @@
 	import { findPerson, personStore } from '$lib/stores/PersonStore';
 	import { onMount } from 'svelte';
 	import { addActionToHistory } from '$lib/stores/HistoryStore';
+	import Input from '$lib/components/UI/Input/Input.svelte';
+	import ColorInput from '$lib/components/UI/ColorInput/ColorInput.svelte';
 
 	let {
 		isEditor = false,
@@ -36,6 +38,8 @@
 
 	let dialogPerson = $state('');
 	let dialogStyle = $state(NodeStyles.Tree);
+	let dialogBGColor = $state('');
+	let dialogTextColor = $state('');
 
 	// svelte-ignore non_reactive_update
 	let selectedNode: NodeLayout;
@@ -74,7 +78,10 @@
 
 	const updateSelectedNode = () => {
 		if (dialogMode === 'ADD') {
-			let createdNode = addNodeBelow(selectedNode.node.id, findPerson(dialogPerson), dialogStyle);
+			let createdNode = addNodeBelow(selectedNode.node.id, findPerson(dialogPerson), dialogStyle, {
+				color: dialogTextColor,
+				backgroundColor: dialogBGColor
+			});
 			addActionToHistory({
 				type: 'addNode',
 				parentID: selectedNode.node.id,
@@ -83,7 +90,11 @@
 		} else {
 			// Make sure selectedNode in History isn't affected by the updateNode change
 			let dataOld = JSON.parse(JSON.stringify(selectedNode.node));
-			updateNode(selectedNode.node.id, dialogStyle, findPerson(dialogPerson));
+			updateNode(selectedNode.node.id, dialogStyle, findPerson(dialogPerson), {
+				color: dialogTextColor,
+				backgroundColor: dialogBGColor
+			});
+
 			addActionToHistory({
 				type: 'editNode',
 				dataOld: dataOld,
@@ -179,6 +190,8 @@
 				dialogMode = 'ADD';
 				dialogPerson = '';
 				dialogStyle = NodeStyles.Tree;
+				dialogBGColor = '#fff';
+				dialogTextColor = '#000';
 				showDialog = true;
 			}}>Add Node</ContextMenu.Item
 		>
@@ -187,6 +200,8 @@
 				dialogMode = 'EDIT';
 				dialogPerson = selectedNode.node.person.id;
 				dialogStyle = selectedNode.node.style;
+				dialogBGColor = selectedNode.node.css.backgroundColor;
+				dialogTextColor = selectedNode.node.css.color;
 				showDialog = true;
 			}}>Edit Node</ContextMenu.Item
 		>
@@ -217,6 +232,8 @@
 					<option value={NodeStyles.Connected}>Connected</option>
 					<option value={NodeStyles.List}>List</option>
 				</SelectInput>
+				<ColorInput required label="Text Color" bind:value={dialogTextColor} />
+				<ColorInput required label="Background Color" bind:value={dialogBGColor} />
 				<div class="button-container">
 					<Button variant="primary" type="submit">Save</Button>
 					<Button

@@ -1,4 +1,4 @@
-import { NodeStyles, type ChartNode, type ChartPerson } from '$types/chart';
+import { NodeStyles, type ChartNode, type ChartPerson, type NodeCSSStyle } from '$types/chart';
 import { writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
@@ -71,21 +71,25 @@ const orgChart: ChartNode = {
 	id: '1',
 	person: testPerson1,
 	style: NodeStyles.Connected,
+	css: { color: '#000', backgroundColor: '#fff' },
 	children: [
 		{
 			id: '2',
 			person: testPerson2,
 			style: NodeStyles.Tree,
+			css: { color: '#000', backgroundColor: '#fff' },
 			children: [
 				{
 					id: '3',
 					person: testPerson3,
 					style: NodeStyles.Connected,
+					css: { color: '#000', backgroundColor: '#fff' },
 					children: [
 						{
 							id: '4',
 							person: testPerson4,
 							style: NodeStyles.List,
+							css: { color: '#000', backgroundColor: '#fff' },
 							children: []
 						}
 					]
@@ -94,7 +98,8 @@ const orgChart: ChartNode = {
 					id: '5',
 					person: testPerson5,
 					style: NodeStyles.Connected,
-					children: []
+					children: [],
+					css: { color: '#000', backgroundColor: '#fff' }
 				}
 			]
 		},
@@ -102,23 +107,27 @@ const orgChart: ChartNode = {
 			id: '6',
 			person: testPerson6,
 			style: NodeStyles.Tree,
+			css: { color: '#000', backgroundColor: '#fff' },
 			children: []
 		},
 		{
 			id: '7',
 			person: testPerson7,
 			style: NodeStyles.List,
+			css: { color: '#000', backgroundColor: '#fff' },
 			children: [
 				{
 					id: '8',
 					person: testPerson8,
 					style: NodeStyles.Connected,
+					css: { color: '#000', backgroundColor: '#fff' },
 					children: []
 				},
 				{
 					id: '9',
 					person: testPerson9,
 					style: NodeStyles.Tree,
+					css: { color: '#000', backgroundColor: '#fff' },
 					children: []
 				}
 			]
@@ -141,14 +150,16 @@ const addNodeBelow = (
 	nodeID: string,
 	personToAdd: ChartPerson,
 	style?: NodeStyles,
+	css?: NodeCSSStyle,
 	id?: string,
 	children?: ChartNode[]
 ) => {
 	let createdNode = {
-		id: id ? id : uuidv4(),
+		id: id ?? uuidv4(),
 		person: personToAdd,
 		style: style ?? NodeStyles.Tree,
-		children: children ? children : []
+		css: css ?? { color: '#000', backgroundColor: '#fff' },
+		children: children ?? []
 	};
 	ChartStore.update((data) => {
 		let foundPerson = findChartNode(get(ChartStore), nodeID);
@@ -167,13 +178,15 @@ const addNodeBelowAtPositon = (
 	style?: NodeStyles,
 	id?: string,
 	children?: ChartNode[],
+	css?: NodeCSSStyle,
 	position: number = 0
 ) => {
 	let createdNode = {
-		id: id ? id : uuidv4(),
+		id: id ?? uuidv4(),
 		person: personToAdd,
 		style: style ?? NodeStyles.Tree,
-		children: children ? children : []
+		children: children ?? [],
+		css: css ?? { color: '#000', backgroundColor: '#fff' }
 	};
 
 	ChartStore.update((data) => {
@@ -207,12 +220,13 @@ const removeNode = (nodeID: string) => {
 	ChartStore.set(rootNode);
 };
 
-const updateNode = (nodeID: string, style: NodeStyles, person: ChartPerson) => {
+const updateNode = (nodeID: string, style: NodeStyles, person: ChartPerson, css?: NodeCSSStyle) => {
 	ChartStore.update((data) => {
 		const nodeToEdit = findChartNode(get(ChartStore), nodeID);
 		if (nodeToEdit) {
 			nodeToEdit.person = person;
 			nodeToEdit.style = style;
+			nodeToEdit.css = css ? css : nodeToEdit.css;
 		}
 
 		return data;

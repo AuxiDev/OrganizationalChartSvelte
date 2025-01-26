@@ -15,6 +15,10 @@
 	import Undo from '../Icons/Undo/Undo.svelte';
 	import Redo from '../Icons/Redo/Redo.svelte';
 	import Tooltip from '../UI/Tooltip/Tooltip.svelte';
+	import type { ChartJSONFormat } from '$types/misc';
+	import { ChartStore } from '$lib/stores/ChartStore';
+	import Upload from '../Icons/Upload/Upload.svelte';
+	import Import from '../Icons/Import/Import.svelte';
 
 	createPerson('Mia', 'CEO', 'https://placehold.co/50x50');
 	createPerson('Lola', 'CFO', 'https://placehold.co/50x50');
@@ -27,6 +31,7 @@
 	let svg: SVGSVGElement | null = $state(null);
 
 	let dialogVisible = $state(false);
+	let confirmDialogVisible = $state(false);
 
 	let filteredPersons = $state<ChartPerson[]>(get(personStore));
 	let textSearch = $state('');
@@ -108,13 +113,71 @@
 			chartContainer.scrollTop = scrollTop - walkY;
 		}
 	};
+
+	const exportChartData = () => {
+		let chartData: ChartJSONFormat = { persons: get(personStore), chartNodeData: get(ChartStore) };
+		let jsonString = JSON.stringify(chartData, null, 2);
+
+		const blob = new Blob([jsonString], { type: 'application/json' });
+
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = 'organizationalChart.json';
+		link.click();
+		URL.revokeObjectURL(url);
+	};
+
+	const importChartData = (event: Event) => {
+		const input = event.target as HTMLInputElement;
+		const file = input?.files?.[0];
+
+		if (!file) {
+			console.error('No file selected');
+			return;
+		}
+
+		const reader = new FileReader();
+
+		reader.onload = () => {
+			try {
+				const jsonData: ChartJSONFormat = JSON.parse(reader.result as string);
+				personStore.set(jsonData.persons);
+				ChartStore.set(jsonData.chartNodeData);
+				console.log('Chart data imported successfully');
+			} catch (error) {
+				console.error('Error parsing JSON:', error);
+			}
+		};
+
+		reader.onerror = () => console.error('File reading error:', reader.error);
+
+		reader.readAsText(file);
+	};
+
+	const triggerFileImport = () => {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = 'application/json';
+		input.onchange = (event) => importChartData(event);
+		input.click();
+	};
 </script>
 
 <div class="editor-container">
 	<div class="toolbar-container">
 		<div class="toolbar-items">
-			<Tooltip text="Save as file">
-				<Button style="height: 30px; width: 30px;" variant="ghost"><Save /></Button>
+			<Tooltip text="Import Data">
+				<Button
+					onclick={() => (confirmDialogVisible = true)}
+					style="height: 30px; width: 30px;"
+					variant="ghost"><Upload /></Button
+				>
+			</Tooltip>
+			<Tooltip text="Export Data">
+				<Button onclick={exportChartData} style="height: 30px; width: 30px;" variant="ghost"
+					><Import /></Button
+				>
 			</Tooltip>
 			<Tooltip text="Download as SVG">
 				<Button style="height: 30px; width: 30px" variant="ghost" onclick={downloadSVG}
@@ -170,6 +233,30 @@
 		</div>
 	</SideBar>
 </div>
+
+<Dialog width={300} bind:visible={confirmDialogVisible}>
+	<div class="dialog-content">
+		<h1 class="dialog-title">Are you sure?</h1>
+		<p>Unsaved data will be lost!</p>
+		<div class="button-container" style="margin-top: 20px; gap: 20px">
+			<Button
+				variant="primary"
+				type="button"
+				onclick={() => {
+					confirmDialogVisible = false;
+					triggerFileImport();
+				}}>Yes</Button
+			>
+			<Button
+				onclick={() => {
+					confirmDialogVisible = false;
+				}}
+				variant="secondary"
+				type="submit">Cancel</Button
+			>
+		</div>
+	</div>
+</Dialog>
 
 <Dialog bind:visible={dialogVisible}>
 	<div class="dialog-content">
@@ -243,7 +330,8 @@
 		width: 100%;
 		gap: 20px;
 		overflow-y: auto;
-		max-height: 90vh;
+		overflow-x: hidden;
+		height: 90vh;
 	}
 
 	.person-container::-webkit-scrollbar {

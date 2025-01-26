@@ -1,3 +1,8 @@
+export type NodeCSSStyle = {
+	color: string;
+	backgroundColor: string;
+};
+
 export type NodeLayout = {
 	node: ChartNode;
 	positionX: number;
@@ -16,6 +21,7 @@ export type ChartNode = {
 	id: string;
 	person: ChartPerson;
 	style: NodeStyles;
+	css: NodeCSSStyle;
 	children: ChartNode[];
 };
 

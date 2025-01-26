@@ -25,7 +25,7 @@ const deletePerson = (id: string) => {
 };
 
 const createPerson = (name: string, description?: string, image?: string, id?: string) => {
-	let createdPerson = { id: id ? id : uuidv4(), name, description, image };
+	let createdPerson = { id: id ?? uuidv4(), name, description, image };
 	personStore.update((persons) => {
 		persons.push(createdPerson);
 		return persons;

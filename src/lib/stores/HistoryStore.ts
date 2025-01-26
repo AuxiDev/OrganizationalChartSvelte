@@ -27,7 +27,6 @@ const addActionToHistory = (action: Action) => {
 		const pointer = get(historyPointer);
 		const newHistory = data.slice(0, pointer + 1);
 		historyPointer.update(() => data.length + 1);
-		console.log(action);
 		return [...newHistory, { ...action, meta: { unDone: false, reDone: true } }];
 	});
 };
@@ -39,6 +38,7 @@ const applyAction = (action: Action) => {
 				action.parentID,
 				action.data.person,
 				action.data.style,
+				action.data.css,
 				action.data.id,
 				action.data.children
 			);
@@ -47,7 +47,12 @@ const applyAction = (action: Action) => {
 			removeNode(action.data.id);
 			break;
 		case 'editNode':
-			updateNode(action.dataNew.id, action.dataNew.style, action.dataNew.person);
+			updateNode(
+				action.dataNew.id,
+				action.dataNew.style,
+				action.dataNew.person,
+				action.dataNew.css
+			);
 			break;
 		case 'addPerson':
 			createPerson(action.data.name, action.data.description, action.data.image, action.data.id);
@@ -74,12 +79,18 @@ const reverseAction = (action: Action) => {
 					action.data.style,
 					action.data.id,
 					action.data.children,
+					action.data.css,
 					action.position
 				);
 			}
 			break;
 		case 'editNode':
-			updateNode(action.dataOld.id, action.dataOld.style, action.dataOld.person);
+			updateNode(
+				action.dataOld.id,
+				action.dataOld.style,
+				action.dataOld.person,
+				action.dataOld.css
+			);
 			break;
 		case 'addPerson':
 			deletePerson(action.data.id);
@@ -99,7 +110,6 @@ const undoAction = () => {
 		if (newPointer >= 0) {
 			const history = get(historyStore);
 			const action = history[newPointer];
-			console.log(pointer);
 			if (action && !action.meta?.unDone) {
 				if (action.meta) {
 					action.meta.unDone = true;

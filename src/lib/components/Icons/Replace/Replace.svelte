@@ -6,7 +6,6 @@
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	class="lucide lucide-replace"
 	><path d="M14 4a2 2 0 0 1 2-2" /><path d="M16 10a2 2 0 0 1-2-2" /><path
 		d="M20 2a2 2 0 0 1 2 2"
 	/><path d="M22 8a2 2 0 0 1-2 2" /><path d="m3 7 3 3 3-3" /><path

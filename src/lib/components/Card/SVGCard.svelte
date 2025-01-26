@@ -44,7 +44,8 @@
 	ondragleave={handleDragLeave}
 	ondrop={handleDrop}
 	class="card"
-	style="height: {height}px; width: {width}px; display: flex; justify-content: left; align-items: center; background-color: white; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: left; border-radius: 10px;"
+	style=" background-color: {data.css.backgroundColor}; color: {data.css
+		.color}; height: {height}px; width: {width}px; display: flex; justify-content: left; align-items: center; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: left; border-radius: 10px;"
 >
 	{#if isDragOver}
 		<div
