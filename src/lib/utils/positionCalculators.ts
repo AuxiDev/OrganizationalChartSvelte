@@ -27,23 +27,20 @@ const calculateSubtreeWidth = (node: ChartNode, nodeWidth: number): number => {
 	if (node.children.length === 0) {
 		return nodeWidth;
 	}
+
 	const siblingPadding = (node.children.length - 1) * 30;
 
 	let totalWidth = node.children.reduce((sum, child) => {
 		return sum + calculateSubtreeWidth(child, nodeWidth);
 	}, 0);
 
-	if (node.style == NodeStyles.List) {
-		let total: number = 0;
-		node.children.forEach((child, index) => {
-			let totalWidth = node.children.reduce((sum, child) => {
-				return sum + calculateSubtreeWidth(child, nodeWidth);
-			}, 0);
+	if (node.style === NodeStyles.List) {
+		const maxChildWidth = Math.max(
+			...node.children.map((child) => calculateSubtreeWidth(child, nodeWidth)),
+			0
+		);
 
-			total = Math.max(total, totalWidth - 300);
-		});
-
-		return totalWidth + total + siblingPadding;
+		return nodeWidth + maxChildWidth + siblingPadding;
 	}
 
 	return totalWidth + siblingPadding;
@@ -111,22 +108,27 @@ const generatePositions = (
 
 		if (node.style === NodeStyles.List) {
 			currentX = parentX - nodeWidth / 2;
-			let beforeChild: ChartNode;
+			let beforeChild: ChartNode = node;
+			let totalChildHeight = 0;
+			newLayoutItem.positionX =
+				newLayoutItem.positionX - calculateSubtreeWidth(node, nodeWidth) / 6;
+
 			node.children.forEach((child, id) => {
 				const childWidth = calculateSubtreeWidth(child, nodeWidth);
+				const childYPosition = childY + totalChildHeight;
+
 				generatePositions(
 					child,
-					currentX + childWidth / 2 + 30,
-					childY +
-						(id !== 1
-							? 0
-							: calculateSubtreeHeight(beforeChild, nodeHeight, verticalSpacing) + verticalSpacing),
+					currentX + childWidth / 2 + 30 - calculateSubtreeWidth(node, nodeWidth) / 6,
+					childYPosition,
 					nodeWidth,
 					nodeHeight,
 					verticalSpacing,
 					layout
 				);
-				beforeChild = child;
+
+				totalChildHeight +=
+					calculateSubtreeHeight(child, nodeHeight, verticalSpacing) + verticalSpacing;
 			});
 		} else {
 			node.children.forEach((child, index) => {

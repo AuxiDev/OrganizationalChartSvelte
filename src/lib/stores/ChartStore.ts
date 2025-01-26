@@ -132,7 +132,7 @@ const orgChart: ChartNode = {
 				},
 				{
 					id: '10',
-					person: testPerson9,
+					person: testPerson1,
 					style: NodeStyles.Tree,
 					css: { color: '#000', backgroundColor: '#fff' },
 					children: []

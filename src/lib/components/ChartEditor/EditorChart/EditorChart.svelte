@@ -161,7 +161,6 @@
 				nodePosition
 			);
 
-			console.log(get(layout));
 			addActionToHistory({
 				type: 'addNode',
 				parentID: result.parent.id,
@@ -287,17 +286,17 @@
 					position: 'RIGHT',
 					item: item
 				})}
+			{/if}
 
-				{#if item.node.children.length === 0}
-					{@render DropZone({
-						width: nodeWidth,
-						height: nodeHeight,
-						x: item.positionX - item.width / 2,
-						y: item.positionY + 60 - item.height / 2,
-						position: 'BELOW',
-						item: item
-					})}
-				{/if}
+			{#if item.node.children.length === 0 && isDragging}
+				{@render DropZone({
+					width: nodeWidth,
+					height: nodeHeight,
+					x: item.positionX - item.width / 2,
+					y: item.positionY + 60 - item.height / 2,
+					position: 'BELOW',
+					item: item
+				})}
 			{/if}
 			<foreignObject
 				x={item.positionX - item.width / 2}
