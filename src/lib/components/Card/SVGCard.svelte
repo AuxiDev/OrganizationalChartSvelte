@@ -17,7 +17,13 @@
 
 	const handleDrop = (event: DragEvent) => {
 		const person: ChartPerson = JSON.parse(event.dataTransfer?.getData('person') ?? '');
-		let dataOld: ChartNode = JSON.parse(JSON.stringify(data));
+		const personToAdd = findPerson(person.id);
+		const dataOld: ChartNode = JSON.parse(JSON.stringify(data));
+		isDragOver = false;
+
+		if (!personToAdd) {
+			return;
+		}
 		updateNode(data.id, data.style, findPerson(person.id));
 
 		addActionToHistory({
@@ -25,8 +31,6 @@
 			dataOld: dataOld,
 			dataNew: JSON.parse(JSON.stringify(data))
 		});
-
-		isDragOver = false;
 	};
 
 	const handleDragLeave = (event: any) => {
@@ -34,9 +38,17 @@
 			isDragOver = false;
 		}
 	};
+
+	const handleDragStart = (event: DragEvent) => {
+		event.dataTransfer?.setData('person', JSON.stringify(data.person));
+		event.dataTransfer?.setData('source', 'CHART_CARD');
+		event.dataTransfer?.setData('nodeData', JSON.stringify(data));
+	};
 </script>
 
 <div
+	draggable="true"
+	ondragstart={handleDragStart}
 	role="region"
 	ondragover={(e) => e.preventDefault()}
 	ondragenter={() => (isDragOver = true)}
@@ -66,7 +78,7 @@
 			</div>
 		</div>
 	{/if}
-	{#if data.person.image}
+	{#if data.person?.image}
 		<img
 			class="image"
 			src={data.person.image}

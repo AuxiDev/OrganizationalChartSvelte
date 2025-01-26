@@ -27,7 +27,6 @@
 		isEditor = false,
 		svgElement = $bindable()
 	}: { isEditor?: boolean; svgElement: SVGGElement | null } = $props();
-
 	let showContextMenu = $state(false);
 	let showDialog = $state(false);
 	// svelte-ignore non_reactive_update
@@ -37,14 +36,11 @@
 	let svgHeight = $state(800);
 	let svgWidth = $state(800);
 	let layout = writable<NodeLayout[]>();
-
 	let dialogPerson = $state('');
 	let dialogStyle = $state(NodeStyles.Tree);
 	let dialogBGColor = $state('');
 	let dialogTextColor = $state('');
-
 	let isDragging = $state(false);
-
 	// svelte-ignore non_reactive_update
 	let selectedNode: NodeLayout;
 	const nodeWidth = 200;
@@ -100,7 +96,6 @@
 				position: -1
 			});
 		} else {
-			// Make sure selectedNode in History isn't affected by the updateNode change
 			let dataOld = JSON.parse(JSON.stringify(selectedNode.node));
 			updateNode(selectedNode.node.id, dialogStyle, findPerson(dialogPerson), {
 				color: dialogTextColor,
@@ -137,8 +132,34 @@
 		let createdNode: ChartNode;
 		isDragging = false;
 
+		let children: ChartNode[] = [];
+
+		if (!personToAdd) {
+			return;
+		}
+
+		if (event.dataTransfer?.getData('source') === 'CHART_CARD') {
+			const nodeData: ChartNode = JSON.parse(event.dataTransfer.getData('nodeData'));
+			children = nodeData.children;
+			const result = findParentByIdWithIndex(nodeData.id);
+			addActionToHistory({
+				type: 'deleteNode',
+				parentID: result?.parent.id ?? '',
+				position: result?.childIndex ?? 0,
+				data: nodeData
+			});
+			removeNode(nodeData.id);
+		}
+
 		if (position === 'BELOW') {
-			createdNode = addNodeBelow(item.node.id, personToAdd);
+			createdNode = addNodeBelow(
+				item.node.id,
+				personToAdd,
+				undefined,
+				undefined,
+				undefined,
+				children
+			);
 			addActionToHistory({
 				type: 'addNode',
 				parentID: item.node.id,
@@ -201,8 +222,7 @@
 		ondrop={(event) => handleDrop(event, item, position)}
 	>
 		<div
-			style="position: absolute;   top: 50%;
-    		transform: translateY(-50%); {position === 'BELOW'
+			style="position: absolute; top: 50%; transform: translateY(-50%); {position === 'BELOW'
 				? 'left: 0; right: 0; margin-inline: auto;'
 				: position === 'LEFT'
 					? 'left: 20px;'

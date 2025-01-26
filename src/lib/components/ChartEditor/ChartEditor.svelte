@@ -2,7 +2,7 @@
 	import { createPerson, personStore } from '$lib/stores/PersonStore';
 	import PersonItem from './PersonItem/PersonItem.svelte';
 	import SideBar from '../UI/SideBar/SideBar.svelte';
-	import { type ChartPerson } from '$types/chart';
+	import { NodeStyles, type ChartPerson } from '$types/chart';
 	import { get } from 'svelte/store';
 	import Input from '../UI/Input/Input.svelte';
 	import Button from '../UI/Button/Button.svelte';
@@ -19,11 +19,8 @@
 	import { ChartStore } from '$lib/stores/ChartStore';
 	import Upload from '../Icons/Upload/Upload.svelte';
 	import Import from '../Icons/Import/Import.svelte';
-
-	createPerson('Mia', 'CEO', 'https://placehold.co/50x50');
-	createPerson('Lola', 'CFO', 'https://placehold.co/50x50');
-	createPerson('Lucy', 'Developer', 'https://placehold.co/50x50');
-	createPerson('Noah', 'Jr. Developer', 'https://placehold.co/50x50');
+	import Trash from '../Icons/Trash/Trash.svelte';
+	import { uuidv4 } from '$lib/utils/helpers';
 
 	let personName = $state('');
 	let personDescription = $state('');
@@ -41,6 +38,8 @@
 	let startY = 0;
 	let scrollLeft = 0;
 	let scrollTop = 0;
+
+	let confirmAction: 'CLEAR_DATA' | 'IMPORT';
 
 	let chartContainer: HTMLDivElement | null = $state(null);
 
@@ -163,6 +162,21 @@
 		input.onchange = (event) => importChartData(event);
 		input.click();
 	};
+
+	const clearEditorData = () => {
+		let rootChartPerson: ChartPerson = { id: uuidv4(), name: 'Root', description: 'Temp' };
+		personStore.set([rootChartPerson]);
+		ChartStore.set({
+			id: uuidv4(),
+			person: rootChartPerson,
+			style: NodeStyles.Connected,
+			css: {
+				color: '#000',
+				backgroundColor: '#fff'
+			},
+			children: []
+		});
+	};
 </script>
 
 <div class="editor-container">
@@ -170,7 +184,10 @@
 		<div class="toolbar-items">
 			<Tooltip text="Import Data">
 				<Button
-					onclick={() => (confirmDialogVisible = true)}
+					onclick={() => {
+						confirmDialogVisible = true;
+						confirmAction = 'IMPORT';
+					}}
 					style="height: 30px; width: 30px;"
 					variant="ghost"><Upload /></Button
 				>
@@ -195,6 +212,16 @@
 					><Redo /></Button
 				>
 			</Tooltip>
+			<Tooltip text="Clear Editor Data">
+				<Button
+					style="height: 30px; width: 30px"
+					variant="ghost"
+					onclick={() => {
+						confirmDialogVisible = true;
+						confirmAction = 'CLEAR_DATA';
+					}}><Trash /></Button
+				>
+			</Tooltip>
 		</div>
 	</div>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -206,6 +233,8 @@
 		onmouseleave={onMouseLeave}
 		onmouseup={onMouseUp}
 		onmousemove={onMouseMove}
+		ondragover={(event) => event.preventDefault}
+		ondragend={() => (isMouseDown = false)}
 		style={isMouseDown ? 'user-select: none;' : ''}
 	>
 		<Chart isEditor={true} bind:svgElement={svg} />
@@ -245,7 +274,7 @@
 				type="button"
 				onclick={() => {
 					confirmDialogVisible = false;
-					triggerFileImport();
+					confirmAction === 'IMPORT' ? triggerFileImport() : clearEditorData();
 				}}>Yes</Button
 			>
 			<Button

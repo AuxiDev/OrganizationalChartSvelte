@@ -45,7 +45,6 @@
 		"vite": "^5.4.11"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-node": "^5.2.12",
-		"uuidv4": "^6.2.13"
+		"@sveltejs/adapter-node": "^5.2.12"
 	}
 }

@@ -6,9 +6,11 @@
 	import ImageInput from '$lib/components/UI/ImageInput/ImageInput.svelte';
 	import Input from '$lib/components/UI/Input/Input.svelte';
 	import Tooltip from '$lib/components/UI/Tooltip/Tooltip.svelte';
+	import { ChartStore } from '$lib/stores/ChartStore';
 	import { addActionToHistory } from '$lib/stores/HistoryStore';
 	import { deletePerson, editPerson } from '$lib/stores/PersonStore';
-	import type { ChartPerson } from '$types/chart';
+	import type { ChartNode, ChartPerson } from '$types/chart';
+	import { get } from 'svelte/store';
 
 	let { person }: { person: ChartPerson } = $props();
 	let personName = $state(person.name);
@@ -16,6 +18,7 @@
 	let personImage = $state(person.image);
 
 	let editVisible = $state(false);
+	let warnDialogVisible = $state(false);
 
 	const saveChanges = () => {
 		editVisible = false;
@@ -39,12 +42,34 @@
 
 	const handleDragStart = (event: DragEvent) => {
 		event.dataTransfer?.setData('person', JSON.stringify(person));
+		event.dataTransfer?.setData('source', 'PERSON_SIDEBAR');
 	};
 
 	const resetInputs = () => {
 		personName = person.name;
 		personDescription = person.description;
 		personImage = person.image;
+	};
+
+	const isPersonInChart = (node: ChartNode, id: string): boolean => {
+		if (node.person.id === id) {
+			return true;
+		}
+
+		for (let child of node.children) {
+			return isPersonInChart(child, id);
+		}
+
+		return false;
+	};
+
+	const handleDeletePerson = () => {
+		if (isPersonInChart(get(ChartStore), person.id)) {
+			warnDialogVisible = true;
+		} else {
+			deletePerson(person.id);
+			addActionToHistory({ type: 'deletePerson', data: person });
+		}
 	};
 </script>
 
@@ -63,17 +88,24 @@
 			>
 		</Tooltip>
 		<Tooltip text="Delete">
-			<Button
-				onclick={() => {
-					deletePerson(person.id);
-					addActionToHistory({ type: 'deletePerson', data: person });
-				}}
-				variant="ghost"
-				style="height: 30px; width: 30px"><Trash /></Button
+			<Button onclick={handleDeletePerson} variant="ghost" style="height: 30px; width: 30px"
+				><Trash /></Button
 			>
 		</Tooltip>
 	</div>
 </div>
+
+<Dialog bind:visible={warnDialogVisible}>
+	<div class="dialog-content">
+		<h1 class="dialog-title">Warning!</h1>
+		<p>You can't delete a person who is used in the chart.</p>
+		<div class="button-container" style="margin-top: 20px;">
+			<Button variant="primary" type="button" onclick={() => (warnDialogVisible = false)}
+				>Acknowledge</Button
+			>
+		</div>
+	</div>
+</Dialog>
 
 <Dialog bind:visible={editVisible}>
 	<div class="dialog-content">

@@ -1,7 +1,6 @@
+import { uuidv4 } from '$lib/utils/helpers';
 import type { ChartPerson } from '$types/chart';
 import { writable, get } from 'svelte/store';
-import { v4 as uuidv4 } from 'uuid';
-
 const personStore = writable<ChartPerson[]>([]);
 
 const editPerson = (id: string, newData: ChartPerson) => {
