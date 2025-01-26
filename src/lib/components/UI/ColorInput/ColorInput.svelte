@@ -25,6 +25,14 @@
 	const openColorPicker = () => {
 		colorPicker.click();
 	};
+
+	const handleInput = (event: Event) => {
+		const input = event.target as HTMLInputElement;
+		const newValue = input.value;
+		if (/^#[0-9A-Fa-f]{3,6}$/.test(newValue)) {
+			value = newValue;
+		}
+	};
 </script>
 
 <div class="input-container">
@@ -32,7 +40,7 @@
 		<label for="input">{label}</label>
 	{/if}
 	<div class="color-input-wrapper">
-		<input type="text" {value} {required} {...rest} />
+		<input type="text" oninput={handleInput} {value} {required} {...rest} />
 		<input type="color" bind:value bind:this={colorPicker} class="color-picker" />
 		<div class="color-preview" style="background-color: {value};" bind:this={colorPreview}></div>
 		<Tooltip text="Pick color">
