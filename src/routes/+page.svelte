@@ -36,10 +36,17 @@
 						person: devManager,
 						style: NodeStyles.Connected,
 						css: { color: '#000', backgroundColor: '#fff' },
+						children: []
+					},
+					{
+						id: '4',
+						person: leadDev,
+						style: NodeStyles.Tree,
+						css: { color: '#000', backgroundColor: '#fff' },
 						children: [
 							{
-								id: '4',
-								person: leadDev,
+								id: '5',
+								person: seniorDev,
 								style: NodeStyles.Tree,
 								css: { color: '#000', backgroundColor: '#fff' },
 								children: []
